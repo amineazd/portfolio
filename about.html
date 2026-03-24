@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Mohamed Amine</title>
+
+  <!-- Same font stack as main portfolio -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       DESIGN TOKENS — Same as main portfolio
+    ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --bg-card-hover: #1c1c28;
+      --text-primary: #f0eeeb;
+      --text-secondary: #9694a0;
+      --text-muted: #5c5a66;
+      --accent: #c8ff00;
+      --accent-dim: rgba(200, 255, 0, 0.12);
+      --accent-glow: rgba(200, 255, 0, 0.25);
+      --accent-secondary: #6366f1;
+      --accent-tertiary: #f472b6;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --container: 1280px;
+      --radius: 16px;
+      --radius-sm: 8px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RESET
+    ═══════════════════════════════════════════════════════════════ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    ::selection { background: var(--accent); color: var(--bg-primary); }
+    a { color: inherit; text-decoration: none; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NOISE OVERLAY
+    ═══════════════════════════════════════════════════════════════ */
+    .noise-overlay {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999; opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 256px 256px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NAVIGATION — Same frosted glass navbar
+    ═══════════════════════════════════════════════════════════════ */
+    .navbar {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      padding: 0 clamp(20px, 4vw, 48px);
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .navbar-inner {
+      max-width: var(--container); margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; height: 72px;
+    }
+    .logo {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
+      letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 12px var(--accent-glow);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.8); } }
+
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-size: 0.85rem; font-weight: 500; color: var(--text-secondary);
+      transition: color 0.3s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1.5px; background: var(--accent);
+      transition: width 0.3s var(--ease-out);
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links a.active { color: var(--accent); }
+    .nav-links a.active::after { width: 100%; }
+    .nav-cta {
+      padding: 10px 24px; border: 1px solid var(--border-hover);
+      border-radius: 100px; color: var(--text-primary) !important;
+      transition: all 0.3s var(--ease-out);
+    }
+    .nav-cta:hover { background: var(--accent); color: var(--bg-primary) !important; border-color: var(--accent); }
+    .nav-cta:hover::after { display: none; }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 8px; }
+    .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--text-primary); transition: all 0.3s var(--ease-out); }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       UTILITIES
+    ═══════════════════════════════════════════════════════════════ */
+    .container { max-width: var(--container); margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+    .section-label {
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-muted);
+      display: flex; align-items: center; gap: 12px; margin-bottom: 48px;
+    }
+    .section-label::before { content: ''; width: 32px; height: 1px; background: var(--text-muted); }
+    .section-label .num { color: var(--accent); }
+
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PAGE HERO — Clean, minimal intro
+    ═══════════════════════════════════════════════════════════════ */
+    .page-hero {
+      padding: 160px 0 80px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-hero-label {
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .page-hero-label::before { content: ''; width: 32px; height: 1px; background: var(--text-muted); }
+    .page-hero h1 {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1;
+      letter-spacing: -0.04em; margin-bottom: 20px;
+    }
+    .page-hero h1 .accent { color: var(--accent); }
+    .page-hero-sub {
+      font-size: 1.15rem; color: var(--text-secondary); max-width: 560px; line-height: 1.7;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LETTER SECTION — Personal intro
+    ═══════════════════════════════════════════════════════════════ */
+    .letter {
+      padding: 100px 0;
+    }
+    .letter-grid {
+      display: grid; grid-template-columns: 1fr 1.2fr; gap: 80px; align-items: start;
+    }
+    .letter-heading {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(1.5rem, 3vw, 2.2rem); line-height: 1.3;
+      letter-spacing: -0.02em; margin-bottom: 12px;
+      position: sticky; top: 100px;
+    }
+    .letter-heading .accent { color: var(--accent); }
+    .letter-intro {
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+    }
+    .letter-body p {
+      color: var(--text-secondary); font-size: 1.05rem; line-height: 1.85; margin-bottom: 24px;
+    }
+    .letter-body strong { color: var(--text-primary); font-weight: 500; }
+    .letter-sig {
+      font-family: var(--font-display); font-weight: 700; font-size: 1.2rem;
+      color: var(--accent); margin-top: 32px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       VALUES — Working with me cards (inspired by Carmen)
+    ═══════════════════════════════════════════════════════════════ */
+    .values {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+    .values-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.03em; margin-bottom: 56px;
+    }
+    .values-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+    }
+    .value-card {
+      padding: 32px; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); transition: all 0.5s var(--ease-out); cursor: default;
+      position: relative; overflow: hidden;
+    }
+    .value-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+      background: var(--accent); transform: scaleX(0); transform-origin: left;
+      transition: transform 0.5s var(--ease-out);
+    }
+    .value-card:hover::before { transform: scaleX(1); }
+    .value-card:hover { background: var(--bg-card-hover); border-color: var(--border-hover); transform: translateY(-3px); }
+    .value-card:nth-child(2)::before { background: var(--accent-secondary); }
+    .value-card:nth-child(3)::before { background: var(--accent-tertiary); }
+    .value-card:nth-child(4)::before { background: var(--accent-secondary); }
+    .value-num {
+      font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em;
+      color: var(--text-muted); margin-bottom: 16px;
+    }
+    .value-title {
+      font-family: var(--font-display); font-weight: 700; font-size: 1.2rem;
+      margin-bottom: 12px;
+    }
+    .value-desc {
+      color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       EXPERIENCE TIMELINE
+    ═══════════════════════════════════════════════════════════════ */
+    .experience {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+    .exp-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.03em; margin-bottom: 56px;
+    }
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .timeline-item {
+      display: grid; grid-template-columns: 180px 1fr; gap: 40px;
+      padding: 32px 0; border-top: 1px solid var(--border);
+      transition: all 0.3s var(--ease-out);
+    }
+    .timeline-item:hover { padding-left: 8px; }
+    .timeline-year {
+      font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em;
+      color: var(--text-muted); padding-top: 4px;
+    }
+    .timeline-year .current {
+      display: inline-block; padding: 3px 10px; border-radius: 100px;
+      background: var(--accent-dim); border: 1px solid rgba(200, 255, 0, 0.15);
+      color: var(--accent); font-size: 0.6rem; margin-left: 8px;
+    }
+    .timeline-role {
+      font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; margin-bottom: 4px;
+    }
+    .timeline-company { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 8px; }
+    .timeline-desc { color: var(--text-muted); font-size: 0.85rem; line-height: 1.7; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CERTIFICATIONS
+    ═══════════════════════════════════════════════════════════════ */
+    .certifications {
+      padding: 100px 0;
+      border-top: 1px solid var(--border);
+    }
+    .cert-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.03em; margin-bottom: 56px;
+    }
+    .cert-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .cert-card {
+      padding: 28px; background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); transition: all 0.4s var(--ease-out);
+    }
+    .cert-card:hover { background: var(--bg-card-hover); border-color: var(--border-hover); transform: translateY(-2px); }
+    .cert-label {
+      font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+    }
+    .cert-name { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; line-height: 1.4; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CTA
+    ═══════════════════════════════════════════════════════════════ */
+    .about-cta {
+      padding: 120px 0 100px; text-align: center;
+      border-top: 1px solid var(--border);
+    }
+    .about-cta h2 {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.5rem); letter-spacing: -0.04em;
+      line-height: 1.1; margin-bottom: 20px;
+    }
+    .about-cta h2 .accent { color: var(--accent); }
+    .about-cta p { font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 36px; max-width: 480px; margin-left: auto; margin-right: auto; }
+    .cta-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .cta-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px; border-radius: 100px; font-weight: 600; font-size: 0.9rem;
+      transition: all 0.3s var(--ease-out);
+    }
+    .cta-link.primary { background: var(--accent); color: var(--bg-primary); }
+    .cta-link.primary:hover { box-shadow: 0 8px 32px var(--accent-glow); transform: translateY(-2px); }
+    .cta-link.secondary { border: 1px solid var(--border-hover); color: var(--text-primary); }
+    .cta-link.secondary:hover { border-color: var(--text-primary); background: rgba(255,255,255,0.04); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════════ */
+    .footer { padding: 40px 0; border-top: 1px solid var(--border); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-muted); }
+    .footer-social { display: flex; gap: 20px; }
+    .footer-social a { font-size: 0.85rem; color: var(--text-muted); transition: color 0.3s; }
+    .footer-social a:hover { color: var(--accent); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none; position: fixed; top: 72px; left: 0; width: 100%;
+        background: rgba(10, 10, 15, 0.97); backdrop-filter: blur(20px);
+        flex-direction: column; padding: 32px; gap: 24px;
+        border-bottom: 1px solid var(--border); z-index: 999;
+      }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+
+      .page-hero { padding: 120px 0 60px; }
+      .letter { padding: 60px 0; }
+      .letter-grid { grid-template-columns: 1fr; gap: 40px; }
+      .letter-heading { position: static; }
+      .values, .experience, .certifications { padding: 60px 0; }
+      .values-grid { grid-template-columns: 1fr; }
+      .cert-grid { grid-template-columns: 1fr; }
+      .timeline-item { grid-template-columns: 1fr; gap: 8px; }
+      .about-cta { padding: 80px 0 60px; }
+      .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+      .cta-links { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="noise-overlay"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       NAVIGATION — Same as main portfolio
+  ═══════════════════════════════════════════════════════════ -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo"><span class="logo-dot"></span> Amine.</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html" class="active">About</a></li>
+        <li><a href="index.html#services">Services</a></li>
+        <li><a href="index.html#work">Work</a></li>
+        <li><a href="index.html#contact" class="nav-cta">Let's Talk</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PAGE HERO
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="page-hero-label">About</div>
+      <h1>The person behind<br>the <span class="accent">pixels</span>.</h1>
+      <p class="page-hero-sub">
+        9+ years of designing across print, brand, web, and product —
+        always with intention, never just decoration.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PERSONAL LETTER
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="letter">
+    <div class="container">
+      <div class="letter-grid">
+        <div>
+          <div class="letter-intro">A little about me</div>
+          <h2 class="letter-heading">
+            Hey, I'm <span class="accent">Mohamed Amine</span>
+          </h2>
+        </div>
+
+        <div class="letter-body reveal">
+          <p>
+            I started my design journey in <strong>print and visual communication</strong> —
+            crafting logos, brand systems, and editorial layouts. That foundation in
+            hierarchy, composition, and typography shaped everything I do today.
+          </p>
+          <p>
+            Over the years, I expanded into <strong>web design, UX research, and product thinking</strong>.
+            I learned that great design isn't about making things look good — it's about
+            making them work beautifully for the people who use them.
+          </p>
+          <p>
+            Today I design <strong>web and mobile experiences</strong> that solve real user problems
+            and drive measurable results. I hold the <strong>Google UX Designer Professional Certificate</strong>
+            and work across the full design process — from research and wireframes to
+            high-fidelity UI and developer handoff.
+          </p>
+          <p>
+            I work best with <strong>startups, agencies, and remote teams</strong> who need a designer
+            that thinks both visually and strategically. I care deeply about my craft,
+            about the users I design for, and about building things that actually matter.
+          </p>
+          <div class="letter-sig">— Amine</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       WORKING WITH ME
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="values">
+    <div class="container">
+      <div class="section-label reveal"><span class="num">01</span> Working with me</div>
+      <h2 class="values-heading reveal">What you can expect.</h2>
+
+      <div class="values-grid">
+        <div class="value-card reveal">
+          <div class="value-num">01</div>
+          <h3 class="value-title">I ask the hard questions early</h3>
+          <p class="value-desc">
+            Before opening Figma, I need to understand the why. Who are the users?
+            What does success look like? I'd rather spend a day on research than
+            a week redesigning the wrong thing.
+          </p>
+        </div>
+
+        <div class="value-card reveal">
+          <div class="value-num">02</div>
+          <h3 class="value-title">I design systems, not just screens</h3>
+          <p class="value-desc">
+            Every component I create is built to scale. Consistent spacing, reusable patterns,
+            and clear naming conventions — so the next designer (or developer) can pick up where I left off.
+          </p>
+        </div>
+
+        <div class="value-card reveal">
+          <div class="value-num">03</div>
+          <h3 class="value-title">I push back with solutions</h3>
+          <p class="value-desc">
+            If something doesn't feel right, I'll say so — but I'll bring alternatives,
+            not just objections. The best work comes from honest, constructive conversations.
+          </p>
+        </div>
+
+        <div class="value-card reveal">
+          <div class="value-num">04</div>
+          <h3 class="value-title">I bridge the gap to development</h3>
+          <p class="value-desc">
+            I understand HTML, CSS, and how designs translate to code. My handoffs are clean,
+            annotated, and developer-friendly — no guesswork, no pixel-chasing after the fact.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       EXPERIENCE TIMELINE
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="experience">
+    <div class="container">
+      <div class="section-label reveal"><span class="num">02</span> Experience</div>
+      <h2 class="exp-heading reveal">Where I've been.</h2>
+
+      <div class="timeline">
+        <div class="timeline-item reveal">
+          <div class="timeline-year">2023 — Present <span class="current">Now</span></div>
+          <div>
+            <div class="timeline-role">Freelance UX/UI & Graphic Designer</div>
+            <div class="timeline-company">Remote — Startups, Agencies & Brands</div>
+            <div class="timeline-desc">
+              End-to-end product design, brand identities, and conversion-optimized web experiences.
+              Working with international clients across SaaS, e-commerce, education, and wellness.
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item reveal">
+          <div class="timeline-year">2019 — 2023</div>
+          <div>
+            <div class="timeline-role">Graphic Designer & Brand Consultant</div>
+            <div class="timeline-company">Agency & Client-side Projects</div>
+            <div class="timeline-desc">
+              Visual identity systems, print design, motion graphics, and marketing collateral.
+              Built brand guidelines for 15+ companies across diverse industries.
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item reveal">
+          <div class="timeline-year">2016 — 2019</div>
+          <div>
+            <div class="timeline-role">Visual Communication Designer</div>
+            <div class="timeline-company">Print & Editorial Design</div>
+            <div class="timeline-desc">
+              Where it all started — editorial layouts, typography systems, logo design,
+              and print production. Built the foundation in hierarchy and composition.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CERTIFICATIONS & EDUCATION
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="certifications">
+    <div class="container">
+      <div class="section-label reveal"><span class="num">03</span> Education</div>
+      <h2 class="cert-heading reveal">Credentials.</h2>
+
+      <div class="cert-grid">
+        <div class="cert-card reveal">
+          <div class="cert-label">Certification</div>
+          <div class="cert-name">Google UX Designer Professional Certificate</div>
+        </div>
+        <div class="cert-card reveal">
+          <div class="cert-label">Degree</div>
+          <div class="cert-name">Bachelor's in Visual Communication & Graphic Design</div>
+        </div>
+        <div class="cert-card reveal">
+          <div class="cert-label">Specialization</div>
+          <div class="cert-name">UX Research, Information Architecture & Usability Testing</div>
+        </div>
+        <div class="cert-card reveal">
+          <div class="cert-label">Continuous Learning</div>
+          <div class="cert-name">AI-Assisted Design Workflows & Prompt Engineering</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CTA
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="about-cta">
+    <div class="container reveal">
+      <h2>Like what you see?<br>Let's <span class="accent">connect</span>.</h2>
+      <p>I'm always open to new projects, collaborations, and interesting conversations.</p>
+      <div class="cta-links">
+        <a href="mailto:amine.azd@gmail.com" class="cta-link primary">Get in Touch</a>
+        <a href="https://www.linkedin.com/in/azennoud-mohamed-amine/" target="_blank" class="cta-link secondary">LinkedIn</a>
+        <a href="https://www.behance.net/amine_yaga" target="_blank" class="cta-link secondary">Behance</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-copy">© 2026 Mohamed Amine — Designed & built with intention.</div>
+        <div class="footer-social">
+          <a href="https://www.behance.net/amine_yaga" target="_blank">Behance</a>
+          <a href="https://www.linkedin.com/in/azennoud-mohamed-amine/" target="_blank">LinkedIn</a>
+          <a href="mailto:amine.azd@gmail.com">Email</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════════════════════════ -->
+  <script>
+    /* Mobile nav toggle */
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+      hamburger.classList.toggle('active');
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => { navLinks.classList.remove('open'); hamburger.classList.remove('active'); });
+    });
+
+    /* Scroll reveal */
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+  </script>
+
+</body>
+</html>
