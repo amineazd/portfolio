@@ -334,64 +334,100 @@
       z-index: 0;
       filter: blur(80px);
       opacity: 0.5;
+      /* Dynamic color properties — updated by JS on scroll & click */
+      --blob-hue-1: 75;     /* lime */
+      --blob-hue-2: 239;    /* indigo */
+      --blob-hue-3: 330;    /* pink */
+      --blob-hue-4: 75;     /* lime dim */
+      --blob-sat: 100%;
+      --blob-light: 50%;
     }
 
     .ambient-blob {
       position: absolute;
       border-radius: 50%;
       will-change: transform;
+      transition: background 1.2s ease;
     }
 
-    /* Blob 1 — Accent lime green, top-left orbit */
+    /* Blob 1 — Dynamic color via CSS custom property */
     .ambient-blob--1 {
       width: clamp(300px, 40vw, 600px);
       height: clamp(300px, 40vw, 600px);
-      background: radial-gradient(circle at 30% 30%, rgba(200, 255, 0, 0.5), rgba(200, 255, 0, 0.05));
+      background: radial-gradient(circle at 30% 30%,
+        hsla(var(--blob-hue-1), var(--blob-sat), var(--blob-light), 0.5),
+        hsla(var(--blob-hue-1), var(--blob-sat), var(--blob-light), 0.05));
       top: -10%;
       left: -5%;
       animation: blobDrift1 18s ease-in-out infinite alternate;
     }
 
-    /* Blob 2 — Indigo secondary, bottom-right orbit */
+    /* Blob 2 — Dynamic indigo */
     .ambient-blob--2 {
       width: clamp(250px, 35vw, 500px);
       height: clamp(250px, 35vw, 500px);
-      background: radial-gradient(circle at 70% 60%, rgba(99, 102, 241, 0.45), rgba(99, 102, 241, 0.03));
+      background: radial-gradient(circle at 70% 60%,
+        hsla(var(--blob-hue-2), var(--blob-sat), var(--blob-light), 0.45),
+        hsla(var(--blob-hue-2), var(--blob-sat), var(--blob-light), 0.03));
       bottom: -15%;
       right: -10%;
       animation: blobDrift2 22s ease-in-out infinite alternate;
     }
 
-    /* Blob 3 — Pink tertiary, center-right float */
+    /* Blob 3 — Dynamic pink */
     .ambient-blob--3 {
       width: clamp(200px, 25vw, 400px);
       height: clamp(200px, 25vw, 400px);
-      background: radial-gradient(circle at 50% 50%, rgba(244, 114, 182, 0.35), rgba(244, 114, 182, 0.02));
+      background: radial-gradient(circle at 50% 50%,
+        hsla(var(--blob-hue-3), var(--blob-sat), var(--blob-light), 0.35),
+        hsla(var(--blob-hue-3), var(--blob-sat), var(--blob-light), 0.02));
       top: 40%;
       right: 15%;
       animation: blobDrift3 15s ease-in-out infinite alternate;
     }
 
-    /* Blob 4 — Dim accent, bottom-left pulse */
+    /* Blob 4 — Dynamic dim accent */
     .ambient-blob--4 {
       width: clamp(150px, 20vw, 350px);
       height: clamp(150px, 20vw, 350px);
-      background: radial-gradient(circle at 40% 70%, rgba(200, 255, 0, 0.25), transparent);
+      background: radial-gradient(circle at 40% 70%,
+        hsla(var(--blob-hue-4), var(--blob-sat), var(--blob-light), 0.25),
+        transparent);
       bottom: 10%;
       left: 20%;
       animation: blobDrift4 20s ease-in-out infinite alternate;
     }
 
-    /* Blob 5 — Interactive blob that follows mouse (positioned via JS) */
+    /* Blob 5 — Interactive mouse-following, also dynamic */
     .ambient-blob--mouse {
       width: clamp(200px, 30vw, 450px);
       height: clamp(200px, 30vw, 450px);
-      background: radial-gradient(circle at 50% 50%, rgba(200, 255, 0, 0.2), rgba(99, 102, 241, 0.1), transparent);
+      background: radial-gradient(circle at 50% 50%,
+        hsla(var(--blob-hue-1), var(--blob-sat), var(--blob-light), 0.2),
+        hsla(var(--blob-hue-2), var(--blob-sat), var(--blob-light), 0.1),
+        transparent);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      transition: left 1.5s var(--ease-out), top 1.5s var(--ease-out);
+      transition: left 1.5s var(--ease-out), top 1.5s var(--ease-out), background 1.2s ease;
       pointer-events: none;
+    }
+
+    /* Click ripple burst effect */
+    .click-ripple {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.6;
+      transform: scale(0);
+      animation: rippleBurst 1s ease-out forwards;
+    }
+
+    @keyframes rippleBurst {
+      0%   { transform: scale(0); opacity: 0.6; }
+      50%  { opacity: 0.3; }
+      100% { transform: scale(4); opacity: 0; }
     }
 
     /* Keyframes — organic drifting with scale morphing */
@@ -1682,7 +1718,7 @@
     <div class="navbar-inner">
       <a href="#" class="logo">
         <span class="logo-dot"></span>
-        Amine.
+        amadesign.
       </a>
 
       <ul class="nav-links" id="navLinks">
@@ -1914,8 +1950,7 @@
       </div>
 
       <div class="work-grid stagger">
-        
-        <!-- Project 1: Noor --> 
+        <!-- Project 1: Noor -->
         <a href="project-noor.html" class="project-card">
           <div class="project-thumbnail">
             <div class="project-thumbnail-bg p1">Noor</div>
@@ -1931,10 +1966,10 @@
               <div class="project-arrow">→</div>
             </div>
           </div>
-       </a>
+        </a>
 
-        <!-- Project 2: VGK Village --> 
-       <a href="project-vgk-karting.html" class="project-card">
+        <!-- Project 2: VGK Village -->
+        <a href="project-vgk-karting.html" class="project-card">
           <div class="project-thumbnail">
             <div class="project-thumbnail-bg p2">VGK</div>
             <span class="project-category">UX / UI · Web Design</span>
@@ -1985,9 +2020,9 @@
               <div class="project-arrow">→</div>
             </div>
           </div>
-        </div>
+        </a>
       </div>
-    </a>
+    </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════
@@ -2158,12 +2193,7 @@
   <footer class="footer">
     <div class="container">
       <div class="footer-inner">
-        <div class="footer-copy">© 2026 Mohamed Amine — Designed & built with intention.</div>
-        <div class="footer-social">
-          <a href="https://www.behance.net/amine_yaga" target="_blank">Behance</a>
-          <a href="https://www.linkedin.com/in/azennoud-mohamed-amine/" target="_blank">LinkedIn</a>
-          <a href="mailto:amine.azd@gmail.com">Email</a>
-        </div>
+        <div class="footer-copy">© 2026 amadesign — Designed & built with intention.</div>
       </div>
     </div>
   </footer>
@@ -2204,34 +2234,149 @@
 
     /**
      * ═══════════════════════════════════════════════════════════
-     * INTERACTIVE MOUSE BLOB — The 5th ambient blob follows
-     * the cursor position within the hero section, creating
-     * an organic, interactive lighting effect
+     * INTERACTIVE HERO — Color-shifting ambient blobs
+     * 1. Mouse blob follows cursor within hero
+     * 2. Scroll shifts all blob hues through a palette
+     * 3. Clicking anywhere spawns a color burst ripple
      * ═══════════════════════════════════════════════════════════
      */
     const mouseBlob = document.getElementById('mouseBlob');
     const heroSection = document.getElementById('hero');
+    const blobsContainer = document.querySelector('.ambient-blobs');
 
+    // ── Color palette for shifting ──
+    // Each entry is [hue1, hue2, hue3, hue4] for the 4 blobs
+    const colorPalettes = [
+      [75,  239, 330, 75 ],   // Original: lime, indigo, pink, lime
+      [170, 280, 40,  200],   // Teal, violet, orange, cyan
+      [280, 340, 75,  200],   // Purple, magenta, lime, teal
+      [200, 75,  280, 340],   // Cyan, lime, purple, magenta
+      [340, 170, 239, 50 ],   // Magenta, teal, indigo, gold
+      [50,  200, 340, 120],   // Gold, cyan, magenta, green
+    ];
+    let currentPaletteIndex = 0;
+
+    // ── 1. Mouse follow ──
     if (mouseBlob && heroSection) {
       heroSection.addEventListener('mousemove', (e) => {
         const rect = heroSection.getBoundingClientRect();
-        // Convert mouse position to percentage within hero
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
         mouseBlob.style.left = x + '%';
         mouseBlob.style.top = y + '%';
       });
 
-      // Reset blob to center when mouse leaves hero
       heroSection.addEventListener('mouseleave', () => {
         mouseBlob.style.left = '50%';
         mouseBlob.style.top = '50%';
       });
 
-      // Hide interactive blob on touch devices
       if ('ontouchstart' in window) {
         mouseBlob.style.display = 'none';
       }
+    }
+
+    // ── 2. Scroll-based color shifting ──
+    // As user scrolls through the hero, blobs smoothly transition hues
+    if (blobsContainer && heroSection) {
+      function updateBlobColors(progress) {
+        // progress: 0 to 1 (how far through hero we've scrolled)
+        const totalPalettes = colorPalettes.length;
+        const scaledProgress = progress * (totalPalettes - 1);
+        const fromIndex = Math.floor(scaledProgress);
+        const toIndex = Math.min(fromIndex + 1, totalPalettes - 1);
+        const blend = scaledProgress - fromIndex;
+
+        const from = colorPalettes[fromIndex];
+        const to = colorPalettes[toIndex];
+
+        // Lerp each hue (handle wrapping around 360)
+        for (let i = 0; i < 4; i++) {
+          let diff = to[i] - from[i];
+          if (diff > 180) diff -= 360;
+          if (diff < -180) diff += 360;
+          const hue = ((from[i] + diff * blend) + 360) % 360;
+          blobsContainer.style.setProperty('--blob-hue-' + (i + 1), Math.round(hue));
+        }
+      }
+
+      window.addEventListener('scroll', () => {
+        const rect = heroSection.getBoundingClientRect();
+        const heroHeight = heroSection.offsetHeight;
+        const scrolled = -rect.top;
+        const progress = Math.max(0, Math.min(1, scrolled / heroHeight));
+        updateBlobColors(progress);
+      }, { passive: true });
+    }
+
+    // ── 3. Click to burst — spawns a ripple and shifts palette ──
+    if (heroSection && blobsContainer) {
+      heroSection.addEventListener('click', (e) => {
+        const rect = heroSection.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Create a ripple element at click position
+        const ripple = document.createElement('div');
+        ripple.className = 'click-ripple';
+        const size = Math.max(rect.width, rect.height) * 0.4;
+        // Pick a random vibrant hue for the ripple
+        const rippleHue = Math.floor(Math.random() * 360);
+        ripple.style.cssText = `
+          width: ${size}px; height: ${size}px;
+          left: ${x - size / 2}px; top: ${y - size / 2}px;
+          background: radial-gradient(circle,
+            hsla(${rippleHue}, 100%, 55%, 0.4),
+            hsla(${rippleHue}, 100%, 55%, 0) 70%);
+        `;
+        blobsContainer.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+
+        // Shift to a random palette on click
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * colorPalettes.length);
+        } while (newIndex === currentPaletteIndex);
+        currentPaletteIndex = newIndex;
+
+        const palette = colorPalettes[currentPaletteIndex];
+        for (let i = 0; i < 4; i++) {
+          blobsContainer.style.setProperty('--blob-hue-' + (i + 1), palette[i]);
+        }
+      });
+
+      // Touch support — tap to change colors on mobile
+      heroSection.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        const rect = heroSection.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
+
+        const ripple = document.createElement('div');
+        ripple.className = 'click-ripple';
+        const size = Math.max(rect.width, rect.height) * 0.4;
+        const rippleHue = Math.floor(Math.random() * 360);
+        ripple.style.cssText = `
+          width: ${size}px; height: ${size}px;
+          left: ${x - size / 2}px; top: ${y - size / 2}px;
+          background: radial-gradient(circle,
+            hsla(${rippleHue}, 100%, 55%, 0.4),
+            hsla(${rippleHue}, 100%, 55%, 0) 70%);
+        `;
+        blobsContainer.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * colorPalettes.length);
+        } while (newIndex === currentPaletteIndex);
+        currentPaletteIndex = newIndex;
+
+        const palette = colorPalettes[currentPaletteIndex];
+        for (let i = 0; i < 4; i++) {
+          blobsContainer.style.setProperty('--blob-hue-' + (i + 1), palette[i]);
+        }
+      }, { passive: true });
     }
 
     /**
