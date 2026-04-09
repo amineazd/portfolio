@@ -951,7 +951,7 @@
        PROCESS SECTION — Step-based timeline
     ═══════════════════════════════════════════════════════════════ */
     .process {
-      padding: 140px 0;
+      padding: 140px 0 0;
     }
 
     .process-heading {
@@ -963,52 +963,139 @@
       max-width: 500px;
     }
 
-    .process-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2px;
+    /* Sticky card stack */
+    .process-stack {
+      position: relative;
     }
 
-    .process-step {
-      padding: 36px 28px;
+    .process-card {
+      position: sticky;
+      top: 90px;
+      padding: 48px 44px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      position: relative;
-      transition: all 0.5s var(--ease-out);
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 40px;
+      align-items: start;
+      transition: box-shadow 0.4s var(--ease-out), border-color 0.4s;
+      will-change: transform;
     }
 
-    .process-step:hover {
-      background: var(--bg-card-hover);
+    /* Each card stacks on top of the previous — last card wins */
+    .process-card:nth-child(1) { top: 90px; z-index: 1; }
+    .process-card:nth-child(2) { top: 106px; z-index: 2; }
+    .process-card:nth-child(3) { top: 122px; z-index: 3; }
+    .process-card:nth-child(4) { top: 138px; z-index: 4; }
+
+    .process-card.active {
       border-color: var(--border-hover);
-      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
     }
 
-    .process-step-num {
+    .process-card-left {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .process-card-num {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 3rem;
-      color: var(--accent-dim);
+      font-size: 4rem;
       line-height: 1;
-      margin-bottom: 20px;
+      color: var(--accent-dim);
       transition: color 0.4s;
     }
 
-    .process-step:hover .process-step-num {
+    .process-card.active .process-card-num {
       color: var(--accent);
     }
 
-    .process-step-title {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 1.15rem;
-      margin-bottom: 12px;
+    .process-card:nth-child(2) .process-card-num { color: rgba(99, 102, 241, 0.15); }
+    .process-card:nth-child(2).active .process-card-num { color: var(--accent-secondary); }
+    .process-card:nth-child(3) .process-card-num { color: rgba(244, 114, 182, 0.15); }
+    .process-card:nth-child(3).active .process-card-num { color: var(--accent-tertiary); }
+    .process-card:nth-child(4) .process-card-num { color: var(--accent-dim); }
+    .process-card:nth-child(4).active .process-card-num { color: var(--accent); }
+
+    .process-card-indicator {
+      width: 3px;
+      height: 40px;
+      background: var(--border);
+      border-radius: 2px;
+      margin-left: 20px;
+      transition: background 0.4s;
     }
 
-    .process-step-desc {
+    .process-card.active .process-card-indicator {
+      background: var(--accent);
+    }
+
+    .process-card:nth-child(2).active .process-card-indicator { background: var(--accent-secondary); }
+    .process-card:nth-child(3).active .process-card-indicator { background: var(--accent-tertiary); }
+
+    .process-card-right h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .process-card-right p {
       color: var(--text-secondary);
-      font-size: 0.85rem;
-      line-height: 1.7;
+      font-size: 1rem;
+      line-height: 1.8;
+      max-width: 540px;
+    }
+
+    .process-card-tag {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Bottom spacer so last card has room to stick */
+    .process-stack-spacer {
+      height: 20vh;
+    }
+
+    @media (max-width: 768px) {
+      .process-card {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 32px 24px;
+      }
+
+      .process-card-left {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .process-card-num {
+        font-size: 2.5rem;
+      }
+
+      .process-card-indicator {
+        width: 32px;
+        height: 3px;
+        margin-left: 0;
+      }
+
+      .process-card:nth-child(1) { top: 80px; }
+      .process-card:nth-child(2) { top: 92px; }
+      .process-card:nth-child(3) { top: 104px; }
+      .process-card:nth-child(4) { top: 116px; }
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -1026,50 +1113,111 @@
       margin-bottom: 56px;
     }
 
-    .tools-grid {
+    .tools-categories {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .tool-category {
+      padding: 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.4s var(--ease-out);
+    }
+
+    .tool-category:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+    }
+
+    .tool-category-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .tool-category:nth-child(2) .tool-category-label { color: var(--accent-secondary); }
+    .tool-category:nth-child(3) .tool-category-label { color: var(--accent-tertiary); }
+    .tool-category:nth-child(5) .tool-category-label { color: var(--accent-secondary); }
+
+    .tool-category-icons {
+      display: flex;
+      flex-wrap: wrap;
       gap: 16px;
     }
 
-    .tool-item {
-      padding: 24px 20px;
-      background: var(--bg-card);
+    .tool-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 100px;
       border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      text-align: center;
-      transition: all 0.4s var(--ease-out);
+      background: var(--bg-primary);
+      transition: all 0.3s var(--ease-out);
       cursor: default;
     }
 
-    .tool-item:hover {
-      background: var(--bg-card-hover);
+    .tool-chip:hover {
       border-color: var(--accent);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(200, 255, 0, 0.06);
+      background: var(--accent-dim);
+      transform: translateY(-2px);
     }
 
-    .tool-icon-wrapper {
-      font-size: 1.8rem;
-      margin-bottom: 12px;
-      filter: grayscale(1) brightness(0.7);
+    .tool-chip-icon {
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tool-chip-icon img,
+    .tool-chip-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* Lucide static SVGs are black by default — invert for dark mode */
+    .tool-chip-icon img[src*="lucide-static"] {
+      filter: invert(1) brightness(0.65);
       transition: filter 0.3s;
     }
 
-    .tool-item:hover .tool-icon-wrapper {
-      filter: grayscale(0) brightness(1);
+    .tool-chip:hover .tool-chip-icon img[src*="lucide-static"] {
+      filter: invert(1) brightness(1);
     }
 
-    .tool-name {
+    .tool-chip-name {
       font-family: var(--font-body);
       font-weight: 500;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-secondary);
+      white-space: nowrap;
       transition: color 0.3s;
     }
 
-    .tool-item:hover .tool-name {
+    .tool-chip:hover .tool-chip-name {
       color: var(--text-primary);
+    }
+
+    @media (max-width: 1024px) {
+      .tools-categories {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .tools-categories {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -1437,11 +1585,6 @@
         gap: 16px;
       }
 
-      .process-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-      }
-
       .about-grid {
         grid-template-columns: 1fr;
         gap: 48px;
@@ -1496,14 +1639,6 @@
         grid-template-columns: 1fr;
       }
 
-      .process-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .tools-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
       .footer-inner {
         flex-direction: column;
         gap: 16px;
@@ -1521,10 +1656,6 @@
     }
 
     @media (max-width: 480px) {
-      .tools-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
       .hero-headline .outline-text {
         -webkit-text-stroke: 0.8px var(--text-primary);
       }
@@ -1590,7 +1721,7 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       PRELOADER — amadesign. logo reveal
+       PRELOADER — amadesign. logo reveal + dot zoom-out portal
     ═══════════════════════════════════════════════════════════════ */
     .preloader {
       position: fixed;
@@ -1600,13 +1731,50 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
     }
 
-    .preloader.done {
-      opacity: 0;
-      visibility: hidden;
+    .preloader.zoom-out {
       pointer-events: none;
+    }
+
+    .preloader.zoom-out .preloader-logo {
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* The expanding dot overlay */
+    .preloader-zoom-dot {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      transform: translate(-50%, -50%) scale(0);
+      z-index: 100000;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .preloader-zoom-dot.expand {
+      animation: dotZoomOut 0.8s cubic-bezier(0.4, 0, 0, 1) forwards;
+    }
+
+    @keyframes dotZoomOut {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      60% {
+        transform: translate(-50%, -50%) scale(120);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(160);
+        opacity: 0;
+      }
     }
 
     .preloader-logo {
@@ -1618,6 +1786,7 @@
       font-size: clamp(1.8rem, 4vw, 2.8rem);
       letter-spacing: -0.03em;
       color: var(--text-primary);
+      transition: opacity 0.3s, transform 0.3s;
     }
 
     .preloader-dot {
@@ -1667,7 +1836,7 @@
       overflow: hidden;
     }
 
-    body.loading > *:not(.preloader):not(.noise-overlay):not(.cursor-glow) {
+    body.loading > *:not(.preloader):not(.preloader-zoom-dot):not(.noise-overlay):not(.cursor-glow) {
       opacity: 0 !important;
       visibility: hidden;
     }
@@ -1686,6 +1855,7 @@
       </div>
     </div>
   </div>
+  <div class="preloader-zoom-dot" id="preloaderZoomDot"></div>
 
   <!-- ═══════════════════════════════════════════════════════════
        CURSOR GLOW — Ambient light that follows cursor
@@ -2009,42 +2179,56 @@
         How I work.
       </h2>
 
-      <div class="process-grid stagger">
-        <div class="process-step">
-          <div class="process-step-num">01</div>
-          <h3 class="process-step-title">Discover</h3>
-          <p class="process-step-desc">
-            Deep-dive into your business, users, and market. Stakeholder interviews,
-            competitive analysis, and user research to define the real problem.
-          </p>
+      <div class="process-stack">
+        <div class="process-card" data-step="1">
+          <div class="process-card-left">
+            <div class="process-card-num">01</div>
+            <div class="process-card-indicator"></div>
+          </div>
+          <div class="process-card-right">
+            <h3>Discover</h3>
+            <p>Deep-dive into your business, users, and market. Stakeholder interviews, competitive analysis, and user research to define the real problem before a single pixel is touched.</p>
+            <span class="process-card-tag">Research & Strategy</span>
+          </div>
         </div>
 
-        <div class="process-step">
-          <div class="process-step-num">02</div>
-          <h3 class="process-step-title">Define</h3>
-          <p class="process-step-desc">
-            Synthesize findings into actionable insights. User personas, journey maps,
-            and information architecture that frames the solution space.
-          </p>
+        <div class="process-card" data-step="2">
+          <div class="process-card-left">
+            <div class="process-card-num">02</div>
+            <div class="process-card-indicator"></div>
+          </div>
+          <div class="process-card-right">
+            <h3>Define</h3>
+            <p>Synthesize findings into actionable insights. User personas, journey maps, and information architecture that frames the solution space and aligns the team on what to build.</p>
+            <span class="process-card-tag">IA & User Flows</span>
+          </div>
         </div>
 
-        <div class="process-step">
-          <div class="process-step-num">03</div>
-          <h3 class="process-step-title">Design</h3>
-          <p class="process-step-desc">
-            Wireframes to high-fidelity prototypes. Iterative design sprints with
-            continuous feedback loops and usability validation.
-          </p>
+        <div class="process-card" data-step="3">
+          <div class="process-card-left">
+            <div class="process-card-num">03</div>
+            <div class="process-card-indicator"></div>
+          </div>
+          <div class="process-card-right">
+            <h3>Design</h3>
+            <p>Wireframes to high-fidelity prototypes. Iterative design sprints with continuous feedback loops and usability validation until the solution feels inevitable, not just functional.</p>
+            <span class="process-card-tag">UI & Prototyping</span>
+          </div>
         </div>
 
-        <div class="process-step">
-          <div class="process-step-num">04</div>
-          <h3 class="process-step-title">Deliver</h3>
-          <p class="process-step-desc">
-            Polished design specs, developer handoff, and post-launch optimization.
-            Measuring impact and iterating based on real data.
-          </p>
+        <div class="process-card" data-step="4">
+          <div class="process-card-left">
+            <div class="process-card-num">04</div>
+            <div class="process-card-indicator"></div>
+          </div>
+          <div class="process-card-right">
+            <h3>Deliver</h3>
+            <p>Polished design specs, developer handoff, and post-launch optimization. Measuring impact and iterating based on real data — because shipping is where design meets reality.</p>
+            <span class="process-card-tag">Handoff & Iteration</span>
+          </div>
         </div>
+
+        <div class="process-stack-spacer"></div>
       </div>
     </div>
   </section>
@@ -2058,23 +2242,105 @@
 
       <h2 class="tools-heading reveal">Tools I use daily.</h2>
 
-      <div class="tools-grid stagger">
-        <div class="tool-item"><div class="tool-icon-wrapper"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/figma.svg" alt="Figma" width="32" height="32"></div><div class="tool-name">Figma</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#31A8FF"/><text x="12" y="16" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#001E36" text-anchor="middle">Ps</text></svg></div><div class="tool-name">Photoshop</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FF9A00"/><text x="12" y="16" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#3A1F00" text-anchor="middle">Ai</text></svg></div><div class="tool-name">Illustrator</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#FF3366"/><text x="12" y="16" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#2E0014" text-anchor="middle">Id</text></svg></div><div class="tool-name">InDesign</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#9999FF"/><text x="12" y="16" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#1A1A4E" text-anchor="middle">Ae</text></svg></div><div class="tool-name">After Effects</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#9999FF"/><text x="12" y="16" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#1A1A4E" text-anchor="middle">Pr</text></svg></div><div class="tool-name">Premiere Pro</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#21759B"/><text x="12" y="16" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#fff" text-anchor="middle">W</text></svg></div><div class="tool-name">WordPress</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#92003B"/><text x="12" y="16" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#fff" text-anchor="middle">E</text></svg></div><div class="tool-name">Elementor</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#E44D26"/><text x="12" y="16" font-family="Arial,sans-serif" font-weight="700" font-size="9" fill="#fff" text-anchor="middle">&lt;/&gt;</text></svg></div><div class="tool-name">HTML/CSS</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai.svg" alt="AI Tools" width="32" height="32"></div><div class="tool-name">AI Tools</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/notion.svg" alt="Notion" width="32" height="32"></div><div class="tool-name">Notion</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9694a0" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></div><div class="tool-name">UX Research</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9694a0" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/></svg></div><div class="tool-name">Wireframing</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9694a0" stroke-width="2" stroke-linecap="round"><polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5"/></svg></div><div class="tool-name">Prototyping</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9694a0" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><div class="tool-name">Design Systems</div></div>
-        <div class="tool-item"><div class="tool-icon-wrapper"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9694a0" stroke-width="2" stroke-linecap="round"><polyline points="4,17 10,11 4,5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div><div class="tool-name">Prompt Design</div></div>
+      <div class="tools-categories stagger">
+        <!-- Design -->
+        <div class="tool-category">
+          <div class="tool-category-label">Design</div>
+          <div class="tool-category-icons">
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/figma.svg" alt="Figma"></div>
+              <div class="tool-chip-name">Figma</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/image.svg" alt="Photoshop"></div>
+              <div class="tool-chip-name">Photoshop</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/pen-tool.svg" alt="Illustrator"></div>
+              <div class="tool-chip-name">Illustrator</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/book-open.svg" alt="InDesign"></div>
+              <div class="tool-chip-name">InDesign</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Motion -->
+        <div class="tool-category">
+          <div class="tool-category-label">Motion & Video</div>
+          <div class="tool-category-icons">
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/clapperboard.svg" alt="After Effects"></div>
+              <div class="tool-chip-name">After Effects</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/film.svg" alt="Premiere Pro"></div>
+              <div class="tool-chip-name">Premiere Pro</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Web -->
+        <div class="tool-category">
+          <div class="tool-category-label">Web & CMS</div>
+          <div class="tool-category-icons">
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/globe.svg" alt="WordPress"></div>
+              <div class="tool-chip-name">WordPress</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/blocks.svg" alt="Elementor"></div>
+              <div class="tool-chip-name">Elementor</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/code.svg" alt="HTML/CSS"></div>
+              <div class="tool-chip-name">HTML / CSS</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- UX Process -->
+        <div class="tool-category">
+          <div class="tool-category-label">UX Process</div>
+          <div class="tool-category-icons">
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/search.svg" alt="UX Research"></div>
+              <div class="tool-chip-name">UX Research</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/layout.svg" alt="Wireframing"></div>
+              <div class="tool-chip-name">Wireframing</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/play-circle.svg" alt="Prototyping"></div>
+              <div class="tool-chip-name">Prototyping</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/grid-3x3.svg" alt="Design Systems"></div>
+              <div class="tool-chip-name">Design Systems</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI & Productivity -->
+        <div class="tool-category">
+          <div class="tool-category-label">AI & Productivity</div>
+          <div class="tool-category-icons">
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai.svg" alt="AI Tools"></div>
+              <div class="tool-chip-name">AI Tools</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/notion.svg" alt="Notion"></div>
+              <div class="tool-chip-name">Notion</div>
+            </div>
+            <div class="tool-chip">
+              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/terminal.svg" alt="Prompt Design"></div>
+              <div class="tool-chip-name">Prompt Design</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -2195,16 +2461,34 @@
   <script>
     /**
      * ═══════════════════════════════════════════════════════════
-     * PRELOADER — Dismiss after logo animation completes
-     * Letters animate in over ~0.85s, then hold for 0.4s,
-     * then fade out the preloader and unlock scroll
+     * PRELOADER — Logo animation → dot zoom-out → reveal
+     * 0.0s–0.85s: dot + letters animate in
+     * 1.4s: logo fades, zoom dot starts expanding
+     * 2.2s: zoom dot fades, preloader removed, site visible
      * ═══════════════════════════════════════════════════════════
      */
     window.addEventListener('load', () => {
+      const preloader = document.getElementById('preloader');
+      const zoomDot = document.getElementById('preloaderZoomDot');
+
+      // Step 1: After letters finish, fade out the logo text
       setTimeout(() => {
-        document.getElementById('preloader').classList.add('done');
+        preloader.classList.add('zoom-out');
+      }, 1400);
+
+      // Step 2: Start the dot zoom-out expansion
+      setTimeout(() => {
+        zoomDot.style.opacity = '1';
+        zoomDot.style.transform = 'translate(-50%, -50%) scale(1)';
+        zoomDot.classList.add('expand');
+      }, 1500);
+
+      // Step 3: Remove preloader, show site
+      setTimeout(() => {
+        preloader.style.display = 'none';
+        zoomDot.style.display = 'none';
         document.body.classList.remove('loading');
-      }, 1800);
+      }, 2300);
     });
 
     /**
@@ -2344,6 +2628,31 @@
      * SMOOTH SCROLL — for anchor links
      * ═══════════════════════════════════════════════════════════
      */
+    /**
+     * ═══════════════════════════════════════════════════════════
+     * STICKY PROCESS CARDS — Highlight active card on scroll
+     * Uses IntersectionObserver to detect which card is most
+     * centered in the viewport and applies the .active class
+     * ═══════════════════════════════════════════════════════════
+     */
+    const processCards = document.querySelectorAll('.process-card');
+
+    if (processCards.length) {
+      const processObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.6) {
+            processCards.forEach(c => c.classList.remove('active'));
+            entry.target.classList.add('active');
+          }
+        });
+      }, {
+        threshold: [0.6],
+        rootMargin: '-20% 0px -40% 0px'
+      });
+
+      processCards.forEach(card => processObserver.observe(card));
+    }
+
     /**
      * ═══════════════════════════════════════════════════════════
      * ORB LIGHTING — Specular highlight + shadow follow cursor
