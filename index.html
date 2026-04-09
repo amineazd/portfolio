@@ -74,6 +74,7 @@
       scroll-padding-top: 80px;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      background: #0a0a0f;
     }
 
     body {
@@ -1528,9 +1529,163 @@
         -webkit-text-stroke: 0.8px var(--text-primary);
       }
     }
+    /* ═══════════════════════════════════════════════════════════════
+       LUCIDE ICONS — Animated stroke-draw on scroll/hover
+    ═══════════════════════════════════════════════════════════════ */
+    .lucide-icon {
+      width: 28px;
+      height: 28px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .service-icon .lucide-icon {
+      width: 28px;
+      height: 28px;
+      color: var(--accent);
+      transition: transform 0.4s var(--ease-out);
+    }
+
+    .service-card:nth-child(2) .service-icon .lucide-icon {
+      color: var(--accent-secondary);
+    }
+
+    .service-card:nth-child(3) .service-icon .lucide-icon {
+      color: var(--accent-tertiary);
+    }
+
+    .service-card:hover .service-icon .lucide-icon {
+      transform: scale(1.15) rotate(-5deg);
+    }
+
+    /* Stroke draw animation for service icons */
+    .service-icon .lucide-icon path,
+    .service-icon .lucide-icon circle,
+    .service-icon .lucide-icon polyline,
+    .service-icon .lucide-icon line,
+    .service-icon .lucide-icon rect {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      transition: stroke-dashoffset 0.8s var(--ease-out);
+    }
+
+    .stagger.visible .service-icon .lucide-icon path,
+    .stagger.visible .service-icon .lucide-icon circle,
+    .stagger.visible .service-icon .lucide-icon polyline,
+    .stagger.visible .service-icon .lucide-icon line,
+    .stagger.visible .service-icon .lucide-icon rect {
+      stroke-dashoffset: 0;
+    }
+
+    /* Project arrow icon */
+    .project-arrow .lucide-icon {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.3s var(--ease-out);
+    }
+
+    .project-card:hover .project-arrow .lucide-icon {
+      transform: rotate(0deg);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PRELOADER — amadesign. logo reveal
+    ═══════════════════════════════════════════════════════════════ */
+    .preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .preloader.done {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .preloader-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+
+    .preloader-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+      opacity: 0;
+      transform: scale(0);
+      animation: preloaderDotIn 0.5s var(--ease-spring) 0.2s forwards;
+    }
+
+    @keyframes preloaderDotIn {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .preloader-text {
+      overflow: hidden;
+      display: flex;
+    }
+
+    .preloader-text span {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(100%);
+      animation: preloaderLetterIn 0.4s var(--ease-out) forwards;
+    }
+
+    .preloader-text span:nth-child(1) { animation-delay: 0.4s; }
+    .preloader-text span:nth-child(2) { animation-delay: 0.45s; }
+    .preloader-text span:nth-child(3) { animation-delay: 0.5s; }
+    .preloader-text span:nth-child(4) { animation-delay: 0.55s; }
+    .preloader-text span:nth-child(5) { animation-delay: 0.6s; }
+    .preloader-text span:nth-child(6) { animation-delay: 0.65s; }
+    .preloader-text span:nth-child(7) { animation-delay: 0.7s; }
+    .preloader-text span:nth-child(8) { animation-delay: 0.75s; }
+    .preloader-text span:nth-child(9) { animation-delay: 0.8s; }
+    .preloader-text span:nth-child(10) { animation-delay: 0.85s; }
+
+    @keyframes preloaderLetterIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Prevent scroll and hide content while preloader is active */
+    body.loading {
+      overflow: hidden;
+    }
+
+    body.loading > *:not(.preloader):not(.noise-overlay):not(.cursor-glow) {
+      opacity: 0 !important;
+      visibility: hidden;
+    }
   </style>
 </head>
-<body>
+<body class="loading">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PRELOADER — amadesign. logo animation
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-logo">
+      <div class="preloader-dot"></div>
+      <div class="preloader-text">
+        <span>a</span><span>m</span><span>a</span><span>d</span><span>e</span><span>s</span><span>i</span><span>g</span><span>n</span><span>.</span>
+      </div>
+    </div>
+  </div>
 
   <!-- ═══════════════════════════════════════════════════════════
        CURSOR GLOW — Ambient light that follows cursor
@@ -1552,9 +1707,7 @@
 
       <ul class="nav-links" id="navLinks">
         <li><a href="about.html">About</a></li>
-        <li><a href="#services">Services</a></li>
         <li><a href="#work">Work</a></li>
-        <li><a href="#process">Process</a></li>
         <li><a href="#contact" class="nav-cta">Let's Talk</a></li>
       </ul>
 
@@ -1701,7 +1854,7 @@
         <!-- Graphic & Brand Design -->
         <div class="service-card">
           <div class="service-number">01</div>
-          <div class="service-icon">✦</div>
+          <div class="service-icon"><i data-lucide="palette" class="lucide-icon"></i></div>
           <h3 class="service-title">Graphic & Brand Design</h3>
           <p class="service-description">
             Visual identity, print, and motion — 9+ years of craft across every format.
@@ -1720,7 +1873,7 @@
         <!-- UI Design -->
         <div class="service-card">
           <div class="service-number">02</div>
-          <div class="service-icon">◈</div>
+          <div class="service-icon"><i data-lucide="layout-dashboard" class="lucide-icon"></i></div>
           <h3 class="service-title">UI Design</h3>
           <p class="service-description">
             Pixel-perfect interfaces built on systematic thinking. Landing pages,
@@ -1739,7 +1892,7 @@
         <!-- UX Design -->
         <div class="service-card">
           <div class="service-number">03</div>
-          <div class="service-icon">◎</div>
+          <div class="service-icon"><i data-lucide="compass" class="lucide-icon"></i></div>
           <h3 class="service-title">UX Design</h3>
           <p class="service-description">
             End-to-end product design from research and wireframes to high-fidelity
@@ -1783,7 +1936,7 @@
             </p>
             <div class="project-meta">
               <span class="project-year">2026</span>
-              <div class="project-arrow">→</div>
+              <div class="project-arrow"><i data-lucide="arrow-up-right" class="lucide-icon"></i></div>
             </div>
           </div>
         </a>
@@ -1801,7 +1954,7 @@
             </p>
             <div class="project-meta">
               <span class="project-year">Dec 2025 – Feb 2026</span>
-              <div class="project-arrow">→</div>
+              <div class="project-arrow"><i data-lucide="arrow-up-right" class="lucide-icon"></i></div>
             </div>
           </div>
         </a>
@@ -1819,7 +1972,7 @@
             </p>
             <div class="project-meta">
               <span class="project-year">2025</span>
-              <div class="project-arrow">→</div>
+              <div class="project-arrow"><i data-lucide="arrow-up-right" class="lucide-icon"></i></div>
             </div>
           </div>
         </a>
@@ -1837,7 +1990,7 @@
             </p>
             <div class="project-meta">
               <span class="project-year">Jan – Mar 2026</span>
-              <div class="project-arrow">→</div>
+              <div class="project-arrow"><i data-lucide="arrow-up-right" class="lucide-icon"></i></div>
             </div>
           </div>
         </a>
@@ -2042,6 +2195,20 @@
   <script>
     /**
      * ═══════════════════════════════════════════════════════════
+     * PRELOADER — Dismiss after logo animation completes
+     * Letters animate in over ~0.85s, then hold for 0.4s,
+     * then fade out the preloader and unlock scroll
+     * ═══════════════════════════════════════════════════════════
+     */
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('preloader').classList.add('done');
+        document.body.classList.remove('loading');
+      }, 1800);
+    });
+
+    /**
+     * ═══════════════════════════════════════════════════════════
      * CURSOR GLOW — Follows the mouse with a soft radial light
      * Uses requestAnimationFrame for smooth 60fps tracking
      * ═══════════════════════════════════════════════════════════
@@ -2226,6 +2393,12 @@
         }
       });
     });
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    lucide.createIcons();
   </script>
 
 </body>
