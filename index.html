@@ -1842,11 +1842,19 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       LAUGON-STYLE HERO
-       Full-bleed B&W portrait + oversized horizontally-scrolling name
-       + corner anchors. Self-contained classes (.lh-hero*) so it can't
-       collide with anything else on the page.
+       LAUGON-STYLE HERO — "Window text" technique
+
+       The effect on laugon.com is achieved by stacking two copies of
+       the same portrait. The bottom copy is darkened. The top copy is
+       clipped to the shape of the text using background-clip: text,
+       and made brighter. The letters become windows that reveal the
+       brighter version of the same photo behind them.
+
+       Both layers MUST share the same background-size and follow the
+       same horizontal scroll, so the cutout looks continuous with the
+       portrait — not like random photo fragments inside letterforms.
     ═══════════════════════════════════════════════════════════════ */
+
     .lh-hero {
       position: relative;
       width: 100%;
@@ -1854,42 +1862,40 @@
       min-height: 640px;
       overflow: hidden;
       background: #000;
+      --lh-portrait: url('assets/hero_portrait.png');
     }
 
-    /* Portrait fills the section. Slight scale so parallax has room. */
+    /* Layer 1: the darkened portrait (what's visible OUTSIDE the letters) */
     .lh-hero__image {
       position: absolute;
-      inset: -30px;
-      background-image: url('assets/hero_portrait.png');
+      inset: 0;
+      background-image: var(--lh-portrait);
       background-size: cover;
       background-position: center center;
       background-repeat: no-repeat;
       z-index: 0;
+      filter: brightness(0.4) contrast(1.1);
       will-change: transform;
-      transform: translate3d(0, 0, 0) scale(1.04);
+      transform: translate3d(0, 0, 0);
       transition: transform 0.8s var(--ease-out);
-      filter: brightness(0.55) contrast(1.05);
     }
 
-    /* Cinematic vignette — darkens edges so portrait reads with depth
-       and corner labels have a slightly darker base to sit on. */
+    /* Soft vignette for cinematic depth (top + bottom fade only,
+       no overall darkening so the letter cutouts stay visible) */
     .lh-hero__shade {
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 110% 90% at 50% 50%,
-          rgba(0,0,0,0) 35%,
-          rgba(0,0,0,0.45) 100%),
         linear-gradient(180deg,
           rgba(0,0,0,0.55) 0%,
           rgba(0,0,0,0) 18%,
-          rgba(0,0,0,0) 75%,
+          rgba(0,0,0,0) 78%,
           rgba(0,0,0,0.7) 100%);
     }
 
-    /* The oversized scrolling name strip — vertically centered */
+    /* The marquee strip — vertically centered band where the text scrolls */
     .lh-hero__marquee {
       position: absolute;
       top: 50%;
@@ -1899,10 +1905,7 @@
       z-index: 2;
       overflow: hidden;
       pointer-events: none;
-      /* Screen blend: white letters punch through where image is dark
-         (most areas), and the lighter face shows through letters where
-         they cross it. Same effect as Laura's portfolio. */
-      mix-blend-mode: screen;
+      /* Allow the inner track to be wider than viewport for seamless loop */
     }
 
     .lh-hero__marquee-track {
@@ -1916,19 +1919,37 @@
       animation-play-state: paused;
     }
 
+    /* Layer 2: the BIG NAME with photo-clipped fill.
+       background-clip: text + transparent fill = letters become a
+       cutout filled with the photo. The brightness(1.4) makes the
+       photo INSIDE the letters lighter than the photo OUTSIDE,
+       producing the laugon "window into the image" effect. */
     .lh-hero__name {
       font-family: var(--font-display);
       font-weight: 800;
       font-size: clamp(7rem, 20vw, 18rem);
       line-height: 0.9;
       letter-spacing: -0.05em;
-      color: #ffffff;
       white-space: nowrap;
       padding: 0 0.4em;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 0.5em;
+
+      /* The cutout fill — same portrait, brightened, fixed position so
+         each letter looks like a window into one continuous image */
+      background-image: var(--lh-portrait);
+      background-size: 100vw auto;
+      background-position: center center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      filter: brightness(1.4) contrast(1.05);
+
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
     }
 
     .lh-hero__name .lh-hero__dot {
@@ -1937,6 +1958,8 @@
       border-radius: 50%;
       background: #ffffff;
       flex-shrink: 0;
+      /* The dot uses solid white so it always reads as a punctuation
+         beat, never gets lost in dark areas of the photo. */
     }
 
     @keyframes lhMarquee {
@@ -2023,26 +2046,20 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Responsive tweaks */
     @media (max-width: 768px) {
-      .lh-hero {
-        height: 100svh;
-        min-height: 560px;
-      }
-      .lh-hero__image {
-        background-position: center 25%;
-      }
+      .lh-hero { height: 100svh; min-height: 560px; }
+      .lh-hero__image { background-position: center 25%; }
       .lh-hero__name {
         font-size: clamp(4.5rem, 26vw, 11rem);
+        background-size: 100vw auto;
+        background-position: center 25%;
       }
       .lh-hero__corner--top-left { top: 90px; }
       .lh-hero__corner--bottom-right {
         font-size: clamp(1.05rem, 5vw, 1.5rem);
         max-width: 70vw;
       }
-      .lh-hero__corner--bottom-right .lh-hero__role-sub {
-        font-size: 0.6rem;
-      }
+      .lh-hero__corner--bottom-right .lh-hero__role-sub { font-size: 0.6rem; }
     }
   </style>
 </head>
@@ -2094,8 +2111,7 @@
   </nav>
 
   <!-- ═══════════════════════════════════════════════════════════
-       LAUGON-STYLE HERO — Full-bleed portrait, oversized scrolling
-       name, corner anchors. Sits BEFORE the existing .hero section.
+       LAUGON-STYLE HERO — Window text effect over portrait
   ═══════════════════════════════════════════════════════════ -->
   <section class="lh-hero" id="lhHero">
     <div class="lh-hero__image" id="lhHeroImage"></div>
@@ -2938,18 +2954,20 @@
       });
     });
 
-    /**
-     * ═══════════════════════════════════════════════════════════
-     * LAUGON-STYLE HERO — Subtle portrait parallax on mousemove
-     * ═══════════════════════════════════════════════════════════
-     */
+    /* ═══════════════════════════════════════════════════════════
+       LAUGON-STYLE HERO — Subtle portrait parallax
+       Only translates the bottom image layer. The text-clipped
+       photo layer uses background-attachment: fixed so it stays
+       perfectly aligned to the viewport — letters always show the
+       SAME spot of the image, never sliding crops.
+    ═══════════════════════════════════════════════════════════ */
     (function initLhHeroParallax() {
       const heroEl = document.getElementById('lhHero');
       const img = document.getElementById('lhHeroImage');
       if (!heroEl || !img) return;
       if ('ontouchstart' in window) return;
 
-      const MAX_SHIFT = 14;
+      const MAX_SHIFT = 12;
       let rafId = null;
       let pendingX = 0, pendingY = 0;
 
@@ -2962,14 +2980,14 @@
         if (!rafId) {
           rafId = requestAnimationFrame(() => {
             img.style.transform =
-              `translate3d(${pendingX}px, ${pendingY}px, 0) scale(1.04)`;
+              `translate3d(${pendingX}px, ${pendingY}px, 0)`;
             rafId = null;
           });
         }
       });
 
       heroEl.addEventListener('mouseleave', () => {
-        img.style.transform = 'translate3d(0, 0, 0) scale(1.04)';
+        img.style.transform = 'translate3d(0, 0, 0)';
       });
     })();
   </script>
