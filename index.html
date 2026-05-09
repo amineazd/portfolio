@@ -1868,6 +1868,7 @@
       will-change: transform;
       transform: translate3d(0, 0, 0) scale(1.04);
       transition: transform 0.8s var(--ease-out);
+      filter: brightness(0.55) contrast(1.05);
     }
 
     /* Cinematic vignette — darkens edges so portrait reads with depth
@@ -1898,13 +1899,17 @@
       z-index: 2;
       overflow: hidden;
       pointer-events: none;
+      /* Screen blend: white letters punch through where image is dark
+         (most areas), and the lighter face shows through letters where
+         they cross it. Same effect as Laura's portfolio. */
+      mix-blend-mode: screen;
     }
 
     .lh-hero__marquee-track {
       display: flex;
       align-items: center;
       width: max-content;
-      animation: lhMarquee 50s linear infinite;
+      animation: lhMarquee 70s linear infinite;
     }
 
     .lh-hero__marquee-track:hover {
@@ -1924,18 +1929,14 @@
       display: flex;
       align-items: center;
       gap: 0.5em;
-      /* Soft shadow keeps text legible over any tone of the portrait
-         without resorting to mix-blend-mode (which can hide the image). */
-      text-shadow: 0 4px 32px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.3);
     }
 
     .lh-hero__name .lh-hero__dot {
       width: 0.28em;
       height: 0.28em;
       border-radius: 50%;
-      background: var(--accent);
+      background: #ffffff;
       flex-shrink: 0;
-      box-shadow: 0 0 24px rgba(200, 255, 0, 0.5);
     }
 
     @keyframes lhMarquee {
