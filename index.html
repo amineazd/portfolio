@@ -1840,6 +1840,190 @@
       opacity: 0 !important;
       visibility: hidden;
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       LAUGON-STYLE HERO
+       Full-bleed B&W portrait, oversized horizontally-scrolling name,
+       corner anchors for role + location. Sits as the first section,
+       above the existing .hero. All scoped under .lh-hero* so it
+       cannot collide with any existing rules.
+    ═══════════════════════════════════════════════════════════════ */
+    .lh-hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 640px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* Full-bleed portrait. Position-right so the face anchors right;
+       slight scale gives parallax room. */
+    .lh-hero__image {
+      position: absolute;
+      inset: -30px;
+      background-image: url('assets/hero_portrait.png');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      z-index: 0;
+      will-change: transform;
+      transform: translate3d(0, 0, 0) scale(1.03);
+      transition: transform 0.8s var(--ease-out);
+      filter: grayscale(1) contrast(1.05) brightness(0.85);
+    }
+
+    /* Subtle vertical fade at top + bottom so navbar and corner labels
+       sit on a slightly darker base. Image stays the star. */
+    .lh-hero__shade {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg,
+          rgba(0,0,0,0.55) 0%,
+          rgba(0,0,0,0) 18%,
+          rgba(0,0,0,0) 78%,
+          rgba(0,0,0,0.55) 100%);
+    }
+
+    /* The oversized scrolling name — sits centered vertically over the portrait */
+    .lh-hero__marquee {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      transform: translateY(-50%);
+      z-index: 2;
+      overflow: hidden;
+      pointer-events: none;
+      mix-blend-mode: difference; /* makes white text pop on any portrait tone */
+    }
+
+    .lh-hero__marquee-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      animation: lhMarquee 28s linear infinite;
+    }
+
+    .lh-hero__marquee-track:hover {
+      animation-play-state: paused;
+    }
+
+    .lh-hero__name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(8rem, 22vw, 20rem);
+      line-height: 0.85;
+      letter-spacing: -0.05em;
+      color: #ffffff;
+      white-space: nowrap;
+      padding: 0 0.4em;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+
+    .lh-hero__name .lh-hero__dot {
+      width: 0.3em;
+      height: 0.3em;
+      border-radius: 50%;
+      background: #ffffff;
+      flex-shrink: 0;
+    }
+
+    @keyframes lhMarquee {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Corner anchors: role (bottom-right), location (bottom-left), nav-style top labels */
+    .lh-hero__corner {
+      position: absolute;
+      z-index: 3;
+      color: #ffffff;
+      font-family: var(--font-body);
+    }
+
+    .lh-hero__corner--top-left {
+      top: 100px;
+      left: clamp(20px, 4vw, 48px);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      opacity: 0;
+      animation: lhFadeIn 1s var(--ease-out) 0.5s forwards;
+    }
+
+    .lh-hero__corner--bottom-left {
+      bottom: 36px;
+      left: clamp(20px, 4vw, 48px);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+      opacity: 0;
+      animation: lhFadeIn 1s var(--ease-out) 0.7s forwards;
+    }
+
+    .lh-hero__corner--bottom-right {
+      bottom: 32px;
+      right: clamp(20px, 4vw, 48px);
+      text-align: right;
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-size: clamp(1.5rem, 2.6vw, 2.4rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      opacity: 0;
+      animation: lhFadeIn 1s var(--ease-out) 0.9s forwards;
+      max-width: min(560px, 60vw);
+    }
+
+    .lh-hero__corner--bottom-right .lh-hero__role-sub {
+      display: block;
+      font-family: var(--font-mono);
+      font-weight: 400;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-top: 10px;
+    }
+
+    @keyframes lhFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* On smaller screens, ease the type sizes and corner padding */
+    @media (max-width: 768px) {
+      .lh-hero {
+        height: 100svh;
+        min-height: 560px;
+      }
+      .lh-hero__image {
+        background-position: center 25%;
+      }
+      .lh-hero__name {
+        font-size: clamp(5rem, 28vw, 12rem);
+      }
+      .lh-hero__corner--top-left { top: 90px; }
+      .lh-hero__corner--bottom-right {
+        font-size: clamp(1.1rem, 5vw, 1.6rem);
+        max-width: 70vw;
+      }
+      .lh-hero__corner--bottom-right .lh-hero__role-sub {
+        font-size: 0.6rem;
+      }
+    }
   </style>
 </head>
 <body class="loading">
@@ -1888,6 +2072,43 @@
       </button>
     </div>
   </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       LAUGON-STYLE HERO — Full-bleed portrait, oversized scrolling
+       name, corner anchors. Sits BEFORE the existing .hero section.
+       Self-contained classes (.lh-hero*) so nothing else is touched.
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="lh-hero" id="lhHero">
+    <div class="lh-hero__image" id="lhHeroImage"></div>
+    <div class="lh-hero__shade"></div>
+
+    <!-- Top-left status label, sits below the global navbar -->
+    <div class="lh-hero__corner lh-hero__corner--top-left">
+      ● Available for projects — 2026
+    </div>
+
+    <!-- The oversized horizontally-scrolling name. Duplicated content
+         inside the track so the loop is seamless. -->
+    <div class="lh-hero__marquee" aria-hidden="true">
+      <div class="lh-hero__marquee-track">
+        <div class="lh-hero__name">MOHAMED AMINE <span class="lh-hero__dot"></span></div>
+        <div class="lh-hero__name">MOHAMED AMINE <span class="lh-hero__dot"></span></div>
+        <div class="lh-hero__name">MOHAMED AMINE <span class="lh-hero__dot"></span></div>
+        <div class="lh-hero__name">MOHAMED AMINE <span class="lh-hero__dot"></span></div>
+      </div>
+    </div>
+
+    <!-- Bottom-left location anchor -->
+    <div class="lh-hero__corner lh-hero__corner--bottom-left">
+      Based in Tangier, Morocco
+    </div>
+
+    <!-- Bottom-right role anchor -->
+    <div class="lh-hero__corner lh-hero__corner--bottom-right">
+      UX/UI Designer<br>Brand &amp; Product
+      <span class="lh-hero__role-sub">9+ years · Available for projects</span>
+    </div>
+  </section>
 
   <!-- ═══════════════════════════════════════════════════════════
        HERO SECTION
@@ -2702,6 +2923,42 @@
         }
       });
     });
+
+    /**
+     * ═══════════════════════════════════════════════════════════
+     * LAUGON-STYLE HERO — subtle portrait parallax on mousemove
+     * Skips on touch devices. Self-contained, only touches #lhHero.
+     * ═══════════════════════════════════════════════════════════
+     */
+    (function initLhHeroParallax() {
+      const heroEl = document.getElementById('lhHero');
+      const img = document.getElementById('lhHeroImage');
+      if (!heroEl || !img) return;
+      if ('ontouchstart' in window) return;
+
+      const MAX_SHIFT = 14; // small — image stays the anchor, not a toy
+      let rafId = null;
+      let pendingX = 0, pendingY = 0;
+
+      heroEl.addEventListener('mousemove', (e) => {
+        const r = heroEl.getBoundingClientRect();
+        const xRatio = ((e.clientX - r.left) / r.width - 0.5) * 2;
+        const yRatio = ((e.clientY - r.top) / r.height - 0.5) * 2;
+        pendingX = -xRatio * MAX_SHIFT;
+        pendingY = -yRatio * MAX_SHIFT;
+        if (!rafId) {
+          rafId = requestAnimationFrame(() => {
+            img.style.transform =
+              `translate3d(${pendingX}px, ${pendingY}px, 0) scale(1.03)`;
+            rafId = null;
+          });
+        }
+      });
+
+      heroEl.addEventListener('mouseleave', () => {
+        img.style.transform = 'translate3d(0, 0, 0) scale(1.03)';
+      });
+    })();
   </script>
 
   <!-- Lucide Icons CDN -->
