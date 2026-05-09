@@ -13,6 +13,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 
+  <!-- GSAP + ScrollTrigger — drives the freestyle services section animation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
   <style>
     /* ═══════════════════════════════════════════════════════════════
        CSS CUSTOM PROPERTIES — Design Tokens
@@ -1874,7 +1878,7 @@
       background-position: center center;
       background-repeat: no-repeat;
       z-index: 0;
-      filter: brightness(0.4) contrast(1.1);
+      filter: brightness(0.85) contrast(1.05);
       will-change: transform;
       transform: translate3d(0, 0, 0);
       transition: transform 0.8s var(--ease-out);
@@ -1895,7 +1899,12 @@
           rgba(0,0,0,0.7) 100%);
     }
 
-    /* The marquee strip — vertically centered band where the text scrolls */
+    /* The marquee strip — vertically centered band where the text scrolls.
+       mix-blend-mode: difference inverts pixels beneath white text:
+       - Over dark areas (background, hair, shirt) → text stays WHITE
+       - Over light face areas → text inverts to DARK ("negative mode")
+       This is the laugon.com effect: text feels solid until it crosses
+       the face, then it switches to negative.  */
     .lh-hero__marquee {
       position: absolute;
       top: 50%;
@@ -1905,7 +1914,7 @@
       z-index: 2;
       overflow: hidden;
       pointer-events: none;
-      /* Allow the inner track to be wider than viewport for seamless loop */
+      mix-blend-mode: difference;
     }
 
     .lh-hero__marquee-track {
@@ -1919,37 +1928,20 @@
       animation-play-state: paused;
     }
 
-    /* Layer 2: the BIG NAME with photo-clipped fill.
-       background-clip: text + transparent fill = letters become a
-       cutout filled with the photo. The brightness(1.4) makes the
-       photo INSIDE the letters lighter than the photo OUTSIDE,
-       producing the laugon "window into the image" effect. */
+    /* Solid white text — the difference blend handles inversion math */
     .lh-hero__name {
       font-family: var(--font-display);
       font-weight: 800;
       font-size: clamp(7rem, 20vw, 18rem);
       line-height: 0.9;
       letter-spacing: -0.05em;
+      color: #ffffff;
       white-space: nowrap;
       padding: 0 0.4em;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       gap: 0.5em;
-
-      /* The cutout fill — same portrait, brightened, fixed position so
-         each letter looks like a window into one continuous image */
-      background-image: var(--lh-portrait);
-      background-size: 100vw auto;
-      background-position: center center;
-      background-attachment: fixed;
-      background-repeat: no-repeat;
-      filter: brightness(1.4) contrast(1.05);
-
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
     }
 
     .lh-hero__name .lh-hero__dot {
@@ -1958,8 +1950,6 @@
       border-radius: 50%;
       background: #ffffff;
       flex-shrink: 0;
-      /* The dot uses solid white so it always reads as a punctuation
-         beat, never gets lost in dark areas of the photo. */
     }
 
     @keyframes lhMarquee {
@@ -2060,6 +2050,18 @@
         max-width: 70vw;
       }
       .lh-hero__corner--bottom-right .lh-hero__role-sub { font-size: 0.6rem; }
+    }
+
+    /* Words inside the services heading — split for the GSAP stagger.
+       NO opacity: 0 in CSS — GSAP applies initial state via gsap.set
+       so a JS failure can never leave the section invisible. */
+    .services-heading .word {
+      display: inline-block;
+      will-change: transform, opacity;
+    }
+    .services-heading .word.accent-word {
+      color: var(--accent);
+      font-style: italic;
     }
   </style>
 </head>
@@ -2268,7 +2270,11 @@
       <div class="section-label reveal"><span class="num">02</span> What I Do</div>
 
       <h2 class="services-heading reveal">
-        Three disciplines. One cohesive vision.
+        <span class="word">Three</span>
+        <span class="word">disciplines.</span>
+        <span class="word accent-word">One</span>
+        <span class="word">cohesive</span>
+        <span class="word">vision.</span>
       </h2>
 
       <div class="services-grid stagger">
@@ -2990,6 +2996,116 @@
         img.style.transform = 'translate3d(0, 0, 0)';
       });
     })();
+
+    /* ═══════════════════════════════════════════════════════════
+       FREESTYLE SERVICES SECTION — GSAP + ScrollTrigger
+       Bulletproof version: waits for window.load (preloader done),
+       sets initial states via gsap.set() ONLY (never CSS), wraps
+       everything in try/catch with a clearProps failsafe so a JS
+       error can never leave the section invisible.
+    ═══════════════════════════════════════════════════════════ */
+    function initServicesFreestyle() {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+        console.warn('[services] GSAP or ScrollTrigger not loaded');
+        return;
+      }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      const section = document.querySelector('.services');
+      if (!section) return;
+
+      const headingWords = section.querySelectorAll('.services-heading .word');
+      const cards = gsap.utils.toArray(section.querySelectorAll('.service-card'));
+      if (!cards.length) return;
+
+      const allInner = section.querySelectorAll(
+        '.service-number, .service-icon, .service-title, .service-description, .service-tag'
+      );
+
+      try {
+        // Heading words: rise + scale into place
+        if (headingWords.length) {
+          gsap.set(headingWords, { y: 40, opacity: 0, scale: 0.7 });
+          gsap.to(headingWords, {
+            y: 0, opacity: 1, scale: 1,
+            duration: 0.9, stagger: 0.1,
+            ease: 'back.out(1.4)',
+            scrollTrigger: {
+              trigger: section,
+              start: 'top 80%',
+              toggleActions: 'play none none none',
+            },
+          });
+        }
+
+        // Cards: fan out from a stacked center
+        const stackOffsets = [
+          { x:  120, rotate: -6 },
+          { x:    0, rotate:  0 },
+          { x: -120, rotate:  6 },
+        ];
+        cards.forEach((card, i) => {
+          const o = stackOffsets[i] || { x: 0, rotate: 0 };
+          gsap.set(card, {
+            x: o.x, rotate: o.rotate, scale: 0.9, y: 40, opacity: 0,
+            transformOrigin: 'center bottom',
+          });
+        });
+        gsap.to(cards, {
+          x: 0, y: 0, rotate: 0, scale: 1, opacity: 1,
+          duration: 1, ease: 'power3.out',
+          stagger: { each: 0.12, from: 'center' },
+          scrollTrigger: {
+            trigger: '.services-grid',
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+          },
+        });
+
+        // Per-card content cascade
+        cards.forEach((card) => {
+          const num   = card.querySelector('.service-number');
+          const icon  = card.querySelector('.service-icon');
+          const title = card.querySelector('.service-title');
+          const desc  = card.querySelector('.service-description');
+          const tags  = card.querySelectorAll('.service-tag');
+
+          if (num)   gsap.set(num,   { x: -40, opacity: 0 });
+          if (icon)  gsap.set(icon,  { scale: 0.5, opacity: 0 });
+          if (title) gsap.set(title, { y: 16, opacity: 0 });
+          if (desc)  gsap.set(desc,  { y: 16, opacity: 0 });
+          if (tags.length) gsap.set(tags, { y: 12, opacity: 0 });
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 80%',
+              toggleActions: 'play none none none',
+            },
+          });
+          if (num)   tl.to(num,   { x: 0, opacity: 1, duration: 0.6, ease: 'back.out(2)' });
+          if (icon)  tl.to(icon,  { scale: 1, opacity: 1, duration: 0.5, ease: 'back.out(2.2)' }, '-=0.35');
+          if (title) tl.to(title, { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }, '-=0.25');
+          if (desc)  tl.to(desc,  { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }, '-=0.3');
+          if (tags.length) tl.to(tags, { y: 0, opacity: 1, duration: 0.35, stagger: 0.04, ease: 'power2.out' }, '-=0.25');
+        });
+
+        ScrollTrigger.refresh();
+      } catch (err) {
+        console.error('[services] Animation init failed, restoring visibility:', err);
+        // Failsafe: clear all props so nothing stays invisible
+        gsap.set([...headingWords, ...cards, ...allInner], { clearProps: 'all' });
+      }
+    }
+
+    // Wait for full load (preloader done + layout stable) before measuring
+    if (document.readyState === 'complete') {
+      initServicesFreestyle();
+    } else {
+      window.addEventListener('load', initServicesFreestyle);
+    }
   </script>
 
   <!-- Lucide Icons CDN -->
