@@ -4,176 +4,742 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SnapOps — SaaS Operational Intelligence — amadesign</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
+    /* ═══════════════════════════════════════════════════════════════
+       DESIGN TOKENS — synced with homepage / other case study pages
+    ═══════════════════════════════════════════════════════════════ */
     :root {
-      --bg-primary: #0a0a0f; --bg-secondary: #111118; --bg-card: #16161f; --bg-card-hover: #1c1c28; --bg-elevated: #1e1e2a;
-      --text-primary: #f0eeeb; --text-secondary: #9694a0; --text-muted: #5c5a66; --text-accent: #c8ff00;
-      --accent: #c8ff00; --accent-dim: rgba(200, 255, 0, 0.12); --accent-glow: rgba(200, 255, 0, 0.25); --accent-secondary: #6366f1; --accent-tertiary: #f472b6;
-      --border: rgba(255, 255, 255, 0.06); --border-hover: rgba(255, 255, 255, 0.12); --glass: rgba(255, 255, 255, 0.03);
-      --font-display: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif; --font-mono: 'JetBrains Mono', monospace;
-      --container: 1280px; --radius: 16px; --radius-sm: 8px; --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --bg-card-hover: #1c1c28;
+      --bg-elevated: #1e1e2a;
+      --text-primary: #f0eeeb;
+      --text-secondary: #9694a0;
+      --text-muted: #5c5a66;
+      --text-accent: #c8ff00;
+      --accent: #c8ff00;
+      --accent-dim: rgba(200, 255, 0, 0.12);
+      --accent-glow: rgba(200, 255, 0, 0.25);
+      --accent-secondary: #6366f1;
+      --accent-tertiary: #f472b6;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --glass: rgba(255, 255, 255, 0.03);
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --container: 1280px;
+      --radius: 16px;
+      --radius-sm: 8px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+      /* SnapOps brand — used only inside mockups */
+      --snap-orange: #F08135;
+      --snap-orange-dim: rgba(240, 129, 53, 0.12);
+      --snap-bg: #0d0e12;
+      --snap-card: #16181f;
+      --snap-text: #ffffff;
+      --snap-text-secondary: #a8acb8;
+      --snap-border: rgba(255, 255, 255, 0.08);
     }
+
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
     ::selection { background: var(--accent); color: var(--bg-primary); }
     a { color: inherit; text-decoration: none; }
     img { max-width: 100%; display: block; }
+
     .container { max-width: var(--container); margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
 
-    .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 0 clamp(20px, 4vw, 48px); background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 1px 0 var(--border); }
-    .navbar-inner { max-width: var(--container); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 72px; }
-    .logo { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px; }
-    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent-glow); animation: pulse 2s ease-in-out infinite; }
+    /* Noise overlay */
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 9999; opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Reveal animations */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NAVBAR — synced with homepage
+    ═══════════════════════════════════════════════════════════════ */
+    .navbar {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      padding: 0 clamp(20px, 4vw, 48px);
+      transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+    }
+    .navbar.scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .navbar-inner {
+      max-width: var(--container); margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+    }
+    .logo {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
+      letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 12px var(--accent-glow);
+      animation: pulse 2s ease-in-out infinite;
+    }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.8); } }
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
-    .nav-links a { font-family: var(--font-body); font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); transition: color 0.3s; position: relative; }
-    .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1.5px; background: var(--accent); transition: width 0.3s var(--ease-out); }
+    .nav-links a {
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+      color: var(--text-secondary); transition: color 0.3s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1.5px;
+      background: var(--accent); transition: width 0.3s var(--ease-out);
+    }
     .nav-links a:hover { color: var(--text-primary); }
     .nav-links a:hover::after { width: 100%; }
-    .nav-cta { padding: 10px 24px; border: 1px solid var(--border-hover); border-radius: 100px; font-size: 0.85rem; font-weight: 500; color: var(--text-primary) !important; transition: all 0.3s var(--ease-out); }
+    .nav-cta {
+      padding: 10px 24px; border: 1px solid var(--border-hover); border-radius: 100px;
+      font-size: 0.85rem; font-weight: 500; color: var(--text-primary) !important;
+      transition: all 0.3s var(--ease-out);
+    }
     .nav-cta:hover { background: var(--accent); color: var(--bg-primary) !important; border-color: var(--accent); }
     .nav-cta:hover::after { display: none; }
     .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 8px; }
     .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--text-primary); transition: all 0.3s var(--ease-out); }
 
-    .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.035; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 256px 256px; }
+    /* ═══════════════════════════════════════════════════════════════
+       PROJECT HERO
+    ═══════════════════════════════════════════════════════════════ */
+    .project-hero {
+      padding: 160px 0 80px;
+      position: relative;
+    }
+    .project-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 60% 60% at 50% 30%, black, transparent);
+      pointer-events: none;
+    }
+    .project-hero-content { position: relative; z-index: 2; }
 
-    .section-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); display: flex; align-items: center; gap: 12px; margin-bottom: 48px; }
-    .section-label::before { content: ''; width: 32px; height: 1px; background: var(--text-muted); }
-    .section-label .num { color: var(--accent); }
-    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .project-category-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 100px;
+      background: var(--accent-dim); border: 1px solid rgba(200, 255, 0, 0.15);
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .project-headline {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      line-height: 1; letter-spacing: -0.04em;
+      margin-bottom: 32px;
+      max-width: 900px;
+    }
+    .project-headline .accent { color: var(--accent); font-style: italic; }
+    .project-intro {
+      max-width: 720px; font-size: 1.15rem;
+      color: var(--text-secondary); line-height: 1.7;
+      margin-bottom: 48px;
+    }
+    .project-cta-row {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 80px;
+    }
+    .live-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px; border-radius: 100px;
+      background: var(--accent); color: var(--bg-primary);
+      font-weight: 600; font-size: 0.95rem;
+      transition: all 0.3s var(--ease-out);
+    }
+    .live-link:hover { box-shadow: 0 8px 32px var(--accent-glow); transform: translateY(-2px); }
+    .live-link svg { transition: transform 0.3s; }
+    .live-link:hover svg { transform: translate(2px, -2px); }
 
-    .project-hero { padding-top: 140px; padding-bottom: 80px; }
-    .project-category-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 100px; background: var(--accent-dim); border: 1px solid rgba(200, 255, 0, 0.15); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
-    .project-hero h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.04em; margin-bottom: 24px; }
-    .project-hero h1 .accent { color: var(--accent); }
-    .project-hero-desc { font-size: 1.1rem; color: var(--text-secondary); line-height: 1.7; max-width: 720px; margin-bottom: 48px; }
+    .project-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 80px;
+    }
+    .project-meta-item {
+      padding: 28px;
+      background: var(--bg-card);
+    }
+    .meta-label {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .meta-value {
+      font-family: var(--font-display); font-weight: 600;
+      font-size: 1rem; line-height: 1.4;
+    }
 
-    .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-bottom: 80px; }
-    .meta-item { padding: 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); }
-    .meta-item-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
-    .meta-item-value { font-family: var(--font-display); font-weight: 600; font-size: 1rem; }
+    /* ═══════════════════════════════════════════════════════════════
+       MOCKUP SHOWCASE — the real screen renders
+    ═══════════════════════════════════════════════════════════════ */
+    .mockup-section { padding: 80px 0; }
 
-    .project-hero-image { width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 100px; border: 1px solid var(--border); background: linear-gradient(135deg, #0a1628, #0f1f3a, #162d50); overflow: hidden; }
-    .project-hero-image img { width: 100%; height: 100%; object-fit: cover; }
+    .mockup-section-label {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 32px;
+    }
+    .mockup-section-label::before { content: ''; width: 32px; height: 1px; background: var(--text-muted); }
+    .mockup-section-label .num { color: var(--accent); }
 
-    .content-section { padding: 80px 0; }
-    .content-section h2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.8rem, 3.5vw, 2.8rem); letter-spacing: -0.03em; margin-bottom: 24px; }
-    .content-section h2 .accent { color: var(--accent); }
-    .content-section p { color: var(--text-secondary); font-size: 1.05rem; line-height: 1.8; max-width: 720px; margin-bottom: 20px; }
+    .mockup-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 720px;
+    }
+    .mockup-subheading {
+      color: var(--text-secondary); font-size: 1.05rem;
+      line-height: 1.7; max-width: 640px;
+      margin-bottom: 56px;
+    }
 
-    .diagnosis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
-    .diagnosis-card { padding: 36px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
-    .diagnosis-card h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-    .diagnosis-card h3 .icon-x { color: #ef4444; }
-    .diagnosis-card h3 .icon-check { color: var(--accent); }
-    .diagnosis-card ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-    .diagnosis-card ul li { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; padding-left: 20px; position: relative; }
-    .diagnosis-card ul li::before { content: '—'; position: absolute; left: 0; color: var(--text-muted); }
+    /* Frame wrapper for SVG renders */
+    .mockup-frame {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: linear-gradient(180deg, #1a1d24 0%, #0d0f14 100%);
+      padding: clamp(16px, 3vw, 32px);
+      box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+    .mockup-frame.no-padding { padding: 0; }
+    .mockup-frame svg { display: block; width: 100%; height: auto; }
 
-    .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 48px; }
-    .process-step { padding: 36px 28px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); transition: all 0.5s var(--ease-out); }
+    /* Mobile triptych — three phone frames side by side */
+    .mobile-triptych {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: center;
+    }
+    .phone-frame {
+      position: relative;
+      max-width: 320px;
+      margin: 0 auto;
+      border-radius: 36px;
+      background: #1a1d24;
+      padding: 12px;
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+    }
+    .phone-frame::before {
+      content: ''; position: absolute;
+      top: 18px; left: 50%; transform: translateX(-50%);
+      width: 100px; height: 22px;
+      background: #000; border-radius: 100px;
+      z-index: 5;
+    }
+    .phone-frame svg {
+      width: 100%; height: auto;
+      border-radius: 28px;
+      display: block;
+    }
+
+    .mockup-caption {
+      margin-top: 24px;
+      font-family: var(--font-mono); font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       OVERVIEW / DIAGNOSIS / PROCESS sections
+    ═══════════════════════════════════════════════════════════════ */
+    .content-section { padding: 100px 0; }
+    .section-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: -0.03em; line-height: 1.1;
+      margin-bottom: 32px;
+      max-width: 720px;
+    }
+    .section-heading .accent { color: var(--accent); }
+    .body-text {
+      max-width: 760px;
+      color: var(--text-secondary);
+      font-size: 1.05rem; line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .body-text strong { color: var(--text-primary); font-weight: 500; }
+
+    .diagnosis-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      margin-top: 48px;
+    }
+    .diagnosis-card {
+      padding: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .diagnosis-card h3 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.15rem; letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .diagnosis-card h3 .icon-circle {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700;
+    }
+    .challenges h3 .icon-circle { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+    .direction h3 .icon-circle { background: var(--accent-dim); color: var(--accent); }
+    .diagnosis-card ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .diagnosis-card li {
+      color: var(--text-secondary); font-size: 0.95rem;
+      line-height: 1.6; padding-left: 20px; position: relative;
+    }
+    .diagnosis-card li::before {
+      content: ''; position: absolute; left: 0; top: 10px;
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .challenges li::before { background: #f472b6; }
+    .direction li::before { background: var(--accent); }
+
+    /* Process timeline */
+    .process-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      margin-top: 48px;
+    }
+    .process-step {
+      padding: 32px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.4s var(--ease-out);
+    }
     .process-step:hover { background: var(--bg-card-hover); border-color: var(--border-hover); transform: translateY(-4px); }
-    .process-step-num { font-family: var(--font-display); font-weight: 800; font-size: 2.5rem; color: var(--accent-dim); line-height: 1; margin-bottom: 16px; transition: color 0.4s; }
-    .process-step:hover .process-step-num { color: var(--accent); }
-    .process-step h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; margin-bottom: 12px; }
-    .process-step p { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.7; }
+    .process-step-num {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: 2.5rem; color: var(--accent-dim); line-height: 1;
+      margin-bottom: 16px;
+    }
+    .process-step h3 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.1rem; margin-bottom: 12px;
+    }
+    .process-step p { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.7; }
 
-    .image-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 64px; }
-    .image-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
-    .image-placeholder { aspect-ratio: 4 / 3; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.75rem; text-align: center; padding: 20px; }
-    .image-placeholder.wide { grid-column: span 2; aspect-ratio: 16 / 9; }
+    /* Impact stats */
+    .impact-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: var(--border); border-radius: var(--radius); overflow: hidden;
+      margin-top: 48px;
+    }
+    .impact-stat { padding: 40px 28px; background: var(--bg-card); text-align: left; }
+    .impact-number {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.03em; color: var(--accent);
+      line-height: 1; margin-bottom: 10px;
+    }
+    .impact-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-secondary); text-transform: uppercase; }
 
-    .impact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
-    .impact-stat { padding: 36px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); text-align: center; }
-    .impact-stat .number { font-family: var(--font-display); font-weight: 800; font-size: 2.5rem; color: var(--accent); line-height: 1; margin-bottom: 8px; }
-    .impact-stat .label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); }
+    /* Toolkit chips */
+    .toolkit-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .toolkit-chip {
+      padding: 10px 18px; border-radius: 100px;
+      border: 1px solid var(--border-hover);
+      font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
 
-    .tools-list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
-    .tools-list span { padding: 10px 20px; border-radius: 100px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.05em; color: var(--text-secondary); transition: all 0.3s; }
-    .tools-list span:hover { border-color: var(--accent); color: var(--text-primary); }
+    /* Next project */
+    .next-project {
+      padding: 100px 0; border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .next-project-label {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 16px;
+    }
+    .next-project-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .next-project a {
+      display: inline-flex; align-items: center; gap: 12px;
+      color: var(--accent); font-size: 1.1rem; font-weight: 500;
+      transition: gap 0.3s var(--ease-out);
+    }
+    .next-project a:hover { gap: 20px; }
 
-    .next-project { padding: 100px 0; border-top: 1px solid var(--border); text-align: center; }
-    .next-project-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 16px; }
-    .next-project a { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.5rem, 3vw, 2.5rem); letter-spacing: -0.03em; color: var(--text-primary); transition: color 0.3s; }
-    .next-project a:hover { color: var(--accent); }
-
+    /* Footer */
     .footer { padding: 40px 0; border-top: 1px solid var(--border); }
-    .footer-inner { display: flex; align-items: center; justify-content: center; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; }
     .footer-copy { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-muted); }
 
-    .live-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; padding: 12px 28px; border-radius: 100px; border: 1px solid var(--border-hover); font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-primary); transition: all 0.3s var(--ease-out); }
-    .live-link:hover { background: var(--accent); color: var(--bg-primary); border-color: var(--accent); }
-
-    @media (max-width: 1024px) { .meta-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } .process-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+    /* ═══════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .project-meta-grid { grid-template-columns: repeat(2, 1fr); }
+      .process-grid { grid-template-columns: repeat(2, 1fr); }
+      .impact-grid { grid-template-columns: repeat(2, 1fr); }
+      .mobile-triptych { grid-template-columns: 1fr; gap: 32px; }
+      .phone-frame { max-width: 280px; }
+    }
     @media (max-width: 768px) {
-      .nav-links { display: none; position: fixed; top: 72px; left: 0; width: 100%; background: rgba(10, 10, 15, 0.97); backdrop-filter: blur(20px); flex-direction: column; padding: 32px; gap: 24px; border-bottom: 1px solid var(--border); }
-      .nav-links.open { display: flex; } .hamburger { display: flex; }
-      .meta-grid { grid-template-columns: 1fr; } .diagnosis-grid { grid-template-columns: 1fr; } .process-grid { grid-template-columns: 1fr; } .impact-grid { grid-template-columns: 1fr; }
-      .image-grid, .image-grid.three-col { grid-template-columns: 1fr; } .image-placeholder.wide { grid-column: span 1; }
+      .nav-links {
+        display: none; position: fixed; top: 72px; left: 0; width: 100%;
+        background: rgba(10, 10, 15, 0.97); backdrop-filter: blur(20px);
+        flex-direction: column; padding: 32px; gap: 24px;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+      .diagnosis-grid { grid-template-columns: 1fr; }
+      .project-meta-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
     }
   </style>
 </head>
 <body>
+
   <div class="noise-overlay"></div>
 
-  <nav class="navbar">
+  <!-- ═══════════════════════════════════════════════════════════
+       NAVIGATION
+  ═══════════════════════════════════════════════════════════ -->
+  <nav class="navbar" id="navbar">
     <div class="navbar-inner">
-      <a href="index.html" class="logo"><span class="logo-dot"></span> amadesign.</a>
+      <a href="index.html" class="logo">
+        <span class="logo-dot"></span>
+        amadesign.
+      </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="about.html">About</a></li>
-        <li><a href="index.html#services">Services</a></li>
         <li><a href="index.html#work">Work</a></li>
-        <li><a href="index.html#process">Process</a></li>
         <li><a href="index.html#contact" class="nav-cta">Let's Talk</a></li>
       </ul>
-      <button class="hamburger" id="hamburger" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
-  <section class="project-hero reveal">
-    <div class="container">
-      <div class="project-category-badge">Product Design · SaaS · Web App</div>
-      <h1>SnapOps — Operational <span class="accent">Intelligence</span> Platform</h1>
-      <p class="project-hero-desc">Designing the landing page and product interface for a next-gen SaaS platform that centralizes time tracking, task management, AI-powered stock control, team communication, and real-time analytics — built for field teams in restaurants, retail, and hospitality.</p>
-      <a href="https://www.snapops.ma/landing" target="_blank" class="live-link">View Live Site →</a>
-    </div>
-  </section>
+  <!-- ═══════════════════════════════════════════════════════════
+       PROJECT HERO
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="project-hero">
+    <div class="container project-hero-content">
+      <div class="project-category-tag">Product Design · SaaS · Web App</div>
 
-  <section class="reveal">
-    <div class="container">
-      <div class="meta-grid">
-        <div class="meta-item"><div class="meta-item-label">Role</div><div class="meta-item-value">UI/UX Designer</div></div>
-        <div class="meta-item"><div class="meta-item-label">Timeline</div><div class="meta-item-value">2026</div></div>
-        <div class="meta-item"><div class="meta-item-label">Platform</div><div class="meta-item-value">Web App (SaaS)</div></div>
-        <div class="meta-item"><div class="meta-item-label">Deliverables</div><div class="meta-item-value">Landing Page, UI Design, Product Interface</div></div>
+      <h1 class="project-headline">
+        SnapOps — Operational <span class="accent">Intelligence</span> Platform
+      </h1>
+
+      <p class="project-intro">
+        Designing the landing page and product interface for a next-gen SaaS platform that centralizes
+        time tracking, task management, AI-powered stock control, team communication, and real-time
+        analytics — built for field teams in restaurants, retail, and hospitality.
+      </p>
+
+      <div class="project-cta-row">
+        <a href="https://www.snapops.ma/landing" target="_blank" rel="noopener" class="live-link">
+          View Live Site
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </div>
+
+      <div class="project-meta-grid">
+        <div class="project-meta-item">
+          <div class="meta-label">Role</div>
+          <div class="meta-value">UI/UX Designer</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Timeline</div>
+          <div class="meta-value">2026</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Platform</div>
+          <div class="meta-value">Web App (SaaS)</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Deliverables</div>
+          <div class="meta-value">Landing Page, UI Design, Product Interface</div>
+        </div>
       </div>
     </div>
   </section>
 
-  <div class="container"><div class="project-hero-image">Replace with SnapOps hero screenshot</div></div>
-
-  <section class="content-section reveal">
+  <!-- ═══════════════════════════════════════════════════════════
+       MOCKUP 1 — HOME PAGE / DESKTOP RENDER
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="mockup-section">
     <div class="container">
-      <div class="section-label"><span class="num">01</span> Overview</div>
-      <h2>One app to run all <span class="accent">field operations</span></h2>
-      <p>SnapOps is an operational intelligence platform designed for businesses with field teams — restaurants, retail chains, hotels, and multi-site operations. It replaces paper checklists, scattered WhatsApp groups, and manual stock counting with a single, structured, mobile-first application.</p>
-      <p>The product needed a landing page that communicates the breadth of features clearly, a product interface that feels fast and intuitive for non-technical field workers, and a visual language that balances professionalism with approachability across multiple industry verticals.</p>
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">01</span> Home Page</div>
+        <h2 class="mockup-heading">The landing page hero</h2>
+        <p class="mockup-subheading">
+          A bold, dark-mode hero with the orange brand accent, immediately answering "what is this product"
+          through clear positioning, a sector marquee, and a before/after value prop below the fold.
+        </p>
+      </div>
+
+      <div class="mockup-frame reveal">
+        <!-- Desktop browser SVG render of SnapOps homepage -->
+        <svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SnapOps homepage desktop render">
+          <defs>
+            <linearGradient id="snapHeroGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#13151b"/>
+              <stop offset="100%" stop-color="#0a0b0f"/>
+            </linearGradient>
+            <linearGradient id="snapHeroOrange" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F08135" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#F08135" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="phoneGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1a1d26"/>
+              <stop offset="100%" stop-color="#0d0f14"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Browser chrome -->
+          <rect x="0" y="0" width="1400" height="900" rx="12" fill="#0a0b0f"/>
+          <rect x="0" y="0" width="1400" height="40" fill="#1c1f26"/>
+          <circle cx="22" cy="20" r="5" fill="#ff5f57"/>
+          <circle cx="42" cy="20" r="5" fill="#febc2e"/>
+          <circle cx="62" cy="20" r="5" fill="#28c840"/>
+          <rect x="500" y="10" width="400" height="20" rx="10" fill="#0d0f14"/>
+          <text x="700" y="25" font-family="Inter, sans-serif" font-size="11" fill="#5c5a66" text-anchor="middle">snapops.ma/landing</text>
+
+          <!-- Main page area -->
+          <rect x="0" y="40" width="1400" height="860" fill="url(#snapHeroGrad)"/>
+
+          <!-- Glow accent (orange ambient) -->
+          <ellipse cx="1100" cy="280" rx="500" ry="300" fill="url(#snapHeroOrange)"/>
+
+          <!-- Top nav -->
+          <text x="60" y="85" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#fff">
+            <tspan fill="#F08135">Snap</tspan>Ops
+          </text>
+          <text x="1180" y="85" font-family="Inter, sans-serif" font-size="13" fill="#a8acb8">Contactez-nous</text>
+          <rect x="1265" y="68" width="100" height="32" rx="16" fill="#F08135"/>
+          <text x="1315" y="88" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">Se connecter</text>
+
+          <!-- HERO HEADING -->
+          <text x="60" y="220" font-family="Inter, sans-serif" font-size="56" font-weight="800" fill="#fff" letter-spacing="-2">
+            <tspan x="60" dy="0">L'intelligence</tspan>
+            <tspan x="60" dy="64">opérationnelle</tspan>
+            <tspan x="60" dy="64">nouvelle <tspan fill="#F08135">génération</tspan>.</tspan>
+          </text>
+
+          <!-- Subhead -->
+          <text x="60" y="475" font-family="Inter, sans-serif" font-size="16" fill="#a8acb8" letter-spacing="-0.2">
+            <tspan x="60" dy="0">Pointage, tâches, stocks, communication, analytics, tout centralisé,</tspan>
+            <tspan x="60" dy="24">tout automatisé. Conçu pour les équipes terrain.</tspan>
+          </text>
+
+          <!-- CTA buttons -->
+          <rect x="60" y="540" width="220" height="50" rx="25" fill="#F08135"/>
+          <text x="170" y="572" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#fff" text-anchor="middle">Essayer 14 jours gratuits</text>
+
+          <rect x="296" y="540" width="200" height="50" rx="25" fill="none" stroke="#3a3f4a" stroke-width="1.5"/>
+          <text x="396" y="572" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#fff" text-anchor="middle">Demander une démo</text>
+
+          <!-- HERO PRODUCT MOCKUP (right side) — phone showing dashboard -->
+          <g transform="translate(900, 130)">
+            <!-- Phone shape -->
+            <rect x="0" y="0" width="320" height="640" rx="40" fill="url(#phoneGrad)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <rect x="14" y="14" width="292" height="612" rx="28" fill="#0d0f14"/>
+            <!-- Notch -->
+            <rect x="120" y="22" width="80" height="20" rx="10" fill="#000"/>
+
+            <!-- Phone screen content -->
+            <text x="32" y="80" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">SnapOps</text>
+            <text x="32" y="100" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#fff">Tableau de bord</text>
+
+            <!-- Status pill -->
+            <rect x="240" y="68" width="56" height="22" rx="11" fill="rgba(34,197,94,0.15)"/>
+            <circle cx="252" cy="79" r="3" fill="#22c55e"/>
+            <text x="284" y="83" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#22c55e" text-anchor="end">Live</text>
+
+            <!-- Big revenue card -->
+            <rect x="32" y="120" width="256" height="100" rx="14" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+            <text x="48" y="146" font-family="Inter, sans-serif" font-size="10" fill="#a8acb8" letter-spacing="0.5">CA DU JOUR</text>
+            <text x="48" y="184" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#fff">14,850</text>
+            <text x="160" y="184" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#a8acb8">MAD</text>
+            <rect x="220" y="138" width="52" height="22" rx="11" fill="rgba(34,197,94,0.15)"/>
+            <text x="246" y="153" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#22c55e" text-anchor="middle">+12%</text>
+
+            <!-- Mini bar chart -->
+            <g transform="translate(48, 196)">
+              <rect x="0" y="6" width="6" height="10" fill="#F08135" opacity="0.4"/>
+              <rect x="12" y="3" width="6" height="13" fill="#F08135" opacity="0.5"/>
+              <rect x="24" y="0" width="6" height="16" fill="#F08135" opacity="0.6"/>
+              <rect x="36" y="4" width="6" height="12" fill="#F08135" opacity="0.7"/>
+              <rect x="48" y="2" width="6" height="14" fill="#F08135" opacity="0.8"/>
+              <rect x="60" y="8" width="6" height="8" fill="#F08135" opacity="0.5"/>
+              <rect x="72" y="5" width="6" height="11" fill="#F08135" opacity="0.7"/>
+              <rect x="84" y="0" width="6" height="16" fill="#F08135"/>
+              <rect x="96" y="3" width="6" height="13" fill="#F08135" opacity="0.7"/>
+              <rect x="108" y="7" width="6" height="9" fill="#F08135" opacity="0.5"/>
+              <rect x="120" y="2" width="6" height="14" fill="#F08135" opacity="0.7"/>
+              <rect x="132" y="6" width="6" height="10" fill="#F08135" opacity="0.5"/>
+              <rect x="144" y="0" width="6" height="16" fill="#F08135" opacity="0.9"/>
+              <rect x="156" y="4" width="6" height="12" fill="#F08135" opacity="0.6"/>
+              <rect x="168" y="2" width="6" height="14" fill="#F08135" opacity="0.8"/>
+              <rect x="180" y="6" width="6" height="10" fill="#F08135" opacity="0.5"/>
+              <rect x="192" y="3" width="6" height="13" fill="#F08135" opacity="0.7"/>
+              <rect x="204" y="0" width="6" height="16" fill="#F08135"/>
+              <rect x="216" y="5" width="6" height="11" fill="#F08135" opacity="0.6"/>
+            </g>
+
+            <!-- Stat tiles row -->
+            <g transform="translate(32, 240)">
+              <rect x="0" y="0" width="80" height="68" rx="10" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+              <text x="12" y="22" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">En service</text>
+              <text x="12" y="48" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#fff">8/10</text>
+              <circle cx="65" cy="20" r="4" fill="#22c55e"/>
+
+              <rect x="88" y="0" width="80" height="68" rx="10" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+              <text x="100" y="22" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Tâches</text>
+              <text x="100" y="48" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#fff">89%</text>
+
+              <rect x="176" y="0" width="80" height="68" rx="10" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+              <text x="188" y="22" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Retards</text>
+              <text x="188" y="48" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#F08135">2</text>
+            </g>
+
+            <!-- Top employees list -->
+            <text x="32" y="345" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8" letter-spacing="0.5">TOP EMPLOYÉS DU JOUR</text>
+
+            <g transform="translate(32, 360)">
+              <rect x="0" y="0" width="256" height="48" rx="10" fill="#1a1d26"/>
+              <circle cx="24" cy="24" r="14" fill="#F08135"/>
+              <text x="24" y="29" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">YK</text>
+              <text x="48" y="22" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff">Youssef K.</text>
+              <text x="48" y="38" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Serveur</text>
+              <text x="240" y="29" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#22c55e" text-anchor="end">98%</text>
+
+              <rect x="0" y="56" width="256" height="48" rx="10" fill="#1a1d26"/>
+              <circle cx="24" cy="80" r="14" fill="#6366f1"/>
+              <text x="24" y="85" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">SM</text>
+              <text x="48" y="78" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff">Sarah M.</text>
+              <text x="48" y="94" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Manager</text>
+              <text x="240" y="85" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#22c55e" text-anchor="end">95%</text>
+
+              <rect x="0" y="112" width="256" height="48" rx="10" fill="#1a1d26"/>
+              <circle cx="24" cy="136" r="14" fill="#f472b6"/>
+              <text x="24" y="141" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">AN</text>
+              <text x="48" y="134" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff">Amina N.</text>
+              <text x="48" y="150" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Serveuse</text>
+              <text x="240" y="141" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#22c55e" text-anchor="end">87%</text>
+            </g>
+
+            <!-- Bottom callout -->
+            <rect x="32" y="540" width="256" height="50" rx="10" fill="rgba(240,129,53,0.08)" stroke="rgba(240,129,53,0.3)"/>
+            <circle cx="56" cy="565" r="10" fill="#F08135"/>
+            <text x="56" y="569" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+            <text x="80" y="562" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff">3 sites connectés</text>
+            <text x="80" y="578" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Comparatif multi-sites actif</text>
+          </g>
+
+          <!-- SECTOR MARQUEE BAND -->
+          <rect x="0" y="780" width="1400" height="60" fill="rgba(255,255,255,0.02)"/>
+          <line x1="0" y1="780" x2="1400" y2="780" stroke="rgba(255,255,255,0.06)"/>
+          <line x1="0" y1="840" x2="1400" y2="840" stroke="rgba(255,255,255,0.06)"/>
+
+          <g font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#5c5a66">
+            <text x="60" y="817">Restaurants</text>
+            <circle cx="170" cy="812" r="2" fill="#F08135"/>
+            <text x="190" y="817">Boulangeries</text>
+            <circle cx="298" cy="812" r="2" fill="#F08135"/>
+            <text x="318" y="817">Bars &amp; Lounges</text>
+            <circle cx="450" cy="812" r="2" fill="#F08135"/>
+            <text x="470" y="817">Hôtels</text>
+            <circle cx="540" cy="812" r="2" fill="#F08135"/>
+            <text x="560" y="817">Fast-food &amp; QSR</text>
+            <circle cx="710" cy="812" r="2" fill="#F08135"/>
+            <text x="730" y="817">Automobile</text>
+            <circle cx="850" cy="812" r="2" fill="#F08135"/>
+            <text x="870" y="817">Retail &amp; Commerces</text>
+            <circle cx="1060" cy="812" r="2" fill="#F08135"/>
+            <text x="1080" y="817">Pharmacies</text>
+            <circle cx="1190" cy="812" r="2" fill="#F08135"/>
+            <text x="1210" y="817">Salons</text>
+            <circle cx="1280" cy="812" r="2" fill="#F08135"/>
+            <text x="1300" y="817">Cafés</text>
+          </g>
+        </svg>
+      </div>
+      <p class="mockup-caption">snapops.ma/landing — Hero section, desktop view</p>
     </div>
   </section>
 
-  <section class="content-section reveal">
+  <!-- ═══════════════════════════════════════════════════════════
+       OVERVIEW & DIAGNOSIS
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section">
     <div class="container">
-      <div class="section-label"><span class="num">02</span> Diagnosis</div>
-      <h2>From operational chaos to <span class="accent">structured control</span></h2>
-      <div class="diagnosis-grid">
-        <div class="diagnosis-card">
-          <h3><span class="icon-x">✕</span> Challenges</h3>
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">02</span> Overview</div>
+        <h2 class="section-heading">One app to run all <span class="accent">field operations</span></h2>
+        <p class="body-text">
+          SnapOps is an operational intelligence platform for businesses with field teams —
+          <strong>restaurants, retail chains, hotels, and multi-site operations</strong>. It replaces
+          paper checklists, scattered WhatsApp groups, and manual stock counting with a single,
+          structured, mobile-first application.
+        </p>
+        <p class="body-text">
+          The product needed a landing page that communicates the breadth of features clearly,
+          a product interface that feels fast and intuitive for non-technical field workers,
+          and a visual language that balances professionalism with approachability across multiple
+          industry verticals.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" style="padding-top: 0;">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">03</span> Diagnosis</div>
+        <h2 class="section-heading">From operational chaos to <span class="accent">structured control</span></h2>
+      </div>
+
+      <div class="diagnosis-grid reveal">
+        <div class="diagnosis-card challenges">
+          <h3><span class="icon-circle">✕</span> Challenges</h3>
           <ul>
             <li>Complex product with 6+ modules — risk of overwhelming users on first visit</li>
             <li>Target audience spans multiple industries with different needs and terminology</li>
@@ -182,8 +748,9 @@
             <li>Multi-tiered pricing structure that needs to feel simple and transparent</li>
           </ul>
         </div>
-        <div class="diagnosis-card">
-          <h3><span class="icon-check">✓</span> Design Direction</h3>
+
+        <div class="diagnosis-card direction">
+          <h3><span class="icon-circle">✓</span> Design Direction</h3>
           <ul>
             <li>Progressive disclosure — reveal complexity gradually through scrolling sections</li>
             <li>Industry marquee and sector cards to let visitors self-identify immediately</li>
@@ -196,65 +763,583 @@
     </div>
   </section>
 
-  <section class="content-section reveal">
+  <!-- ═══════════════════════════════════════════════════════════
+       MOCKUP 2 — MOBILE SCREENS (TRIPTYCH)
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="mockup-section" style="padding-top: 60px;">
     <div class="container">
-      <div class="section-label"><span class="num">03</span> Process</div>
-      <h2>Designing for <span class="accent">complexity</span>, delivering simplicity</h2>
-      <div class="process-grid">
-        <div class="process-step"><div class="process-step-num">01</div><h3>Product Audit</h3><p>Mapped all 6 modules (pointage, tasks, stocks, feed, analytics, AI assistant) and defined the feature hierarchy for the landing page narrative.</p></div>
-        <div class="process-step"><div class="process-step-num">02</div><h3>Information Architecture</h3><p>Structured the landing page as a conversion funnel: hero → problem → solution → features → sectors → pricing → CTA. Each section answers one objection.</p></div>
-        <div class="process-step"><div class="process-step-num">03</div><h3>UI Design</h3><p>High-fidelity designs in Figma. Dark theme with embedded product mockups, interactive pricing cards, and sector-specific imagery. Mobile-first responsive.</p></div>
-        <div class="process-step"><div class="process-step-num">04</div><h3>Handoff & Iteration</h3><p>Delivered annotated specs for Next.js implementation. Iterated on the AI assistant section and pricing tier presentation based on stakeholder feedback.</p></div>
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">04</span> Mobile Screens</div>
+        <h2 class="mockup-heading">Mobile-first product interface</h2>
+        <p class="mockup-subheading">
+          Three flagship modules from the SnapOps app — designed for field workers who need to
+          act fast, with one thumb, in noisy environments. Pointage, Tâches & HACCP, and the team Feed.
+        </p>
+      </div>
+
+      <div class="mobile-triptych reveal">
+        <!-- ─────────── PHONE 1: POINTAGE ─────────── -->
+        <div>
+          <div class="phone-frame">
+            <svg viewBox="0 0 280 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SnapOps Pointage screen">
+              <defs>
+                <linearGradient id="bgP1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#13151b"/>
+                  <stop offset="100%" stop-color="#0a0b0f"/>
+                </linearGradient>
+              </defs>
+              <rect x="0" y="0" width="280" height="580" rx="28" fill="url(#bgP1)"/>
+
+              <!-- Status bar -->
+              <text x="20" y="24" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff">9:41</text>
+              <g transform="translate(220, 14)">
+                <rect x="0" y="2" width="3" height="6" rx="1" fill="#fff"/>
+                <rect x="5" y="0" width="3" height="8" rx="1" fill="#fff"/>
+                <rect x="10" y="-2" width="3" height="10" rx="1" fill="#fff"/>
+                <rect x="15" y="-4" width="3" height="12" rx="1" fill="#fff"/>
+                <rect x="28" y="0" width="20" height="10" rx="2" stroke="#fff" stroke-width="0.8" fill="none"/>
+                <rect x="30" y="2" width="14" height="6" rx="1" fill="#fff"/>
+              </g>
+
+              <!-- Header -->
+              <text x="20" y="68" font-family="Inter, sans-serif" font-size="22" font-weight="800" fill="#fff">Pointage</text>
+              <text x="20" y="88" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">Restaurant Maarif</text>
+
+              <!-- Big time circle / status card -->
+              <rect x="20" y="106" width="240" height="146" rx="18" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+              <rect x="36" y="122" width="76" height="22" rx="11" fill="rgba(34,197,94,0.15)"/>
+              <circle cx="48" cy="133" r="3" fill="#22c55e"/>
+              <text x="60" y="137" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#22c55e">En service</text>
+
+              <text x="36" y="180" font-family="Inter, sans-serif" font-size="32" font-weight="800" fill="#fff" letter-spacing="-1">08:02:47</text>
+              <text x="36" y="206" font-family="Inter, sans-serif" font-size="10" fill="#a8acb8">Restaurant Maarif</text>
+              <g transform="translate(168, 198)">
+                <circle cx="6" cy="0" r="6" fill="rgba(34,197,94,0.15)"/>
+                <path d="M3 0 L5 2 L9 -2" stroke="#22c55e" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <text x="184" y="201" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#22c55e">Vérifié</text>
+
+              <!-- Button row -->
+              <rect x="36" y="222" width="100" height="20" rx="10" fill="#0d0f14"/>
+              <text x="86" y="236" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#fff" text-anchor="middle">Pause</text>
+              <rect x="144" y="222" width="100" height="20" rx="10" fill="#F08135"/>
+              <text x="194" y="236" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#fff" text-anchor="middle">Fin de shift</text>
+
+              <!-- Team list -->
+              <text x="20" y="285" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff" letter-spacing="0.3">ÉQUIPE EN SERVICE</text>
+
+              <!-- Team member 1 -->
+              <rect x="20" y="298" width="240" height="56" rx="12" fill="#1a1d26"/>
+              <circle cx="44" cy="326" r="16" fill="#F08135"/>
+              <text x="44" y="331" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">YK</text>
+              <text x="68" y="322" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff">Youssef K.</text>
+              <text x="68" y="338" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Serveur · 08:00</text>
+              <circle cx="240" cy="326" r="4" fill="#22c55e"/>
+
+              <!-- Team member 2 -->
+              <rect x="20" y="362" width="240" height="56" rx="12" fill="#1a1d26"/>
+              <circle cx="44" cy="390" r="16" fill="#6366f1"/>
+              <text x="44" y="395" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">AN</text>
+              <text x="68" y="386" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff">Amina N.</text>
+              <text x="68" y="402" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Serveuse · 08:08</text>
+              <circle cx="240" cy="390" r="4" fill="#22c55e"/>
+
+              <!-- Team member 3 -->
+              <rect x="20" y="426" width="240" height="56" rx="12" fill="#1a1d26"/>
+              <circle cx="44" cy="454" r="16" fill="#f472b6"/>
+              <text x="44" y="459" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">KL</text>
+              <text x="68" y="450" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff">Karim L.</text>
+              <text x="68" y="466" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Cuisinier · 07:55</text>
+              <circle cx="240" cy="454" r="4" fill="#22c55e"/>
+
+              <!-- Bottom tab bar -->
+              <rect x="20" y="510" width="240" height="56" rx="20" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+              <circle cx="50" cy="538" r="14" fill="rgba(240,129,53,0.15)"/>
+              <text x="50" y="542" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#F08135" text-anchor="middle">⏱</text>
+              <text x="106" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">📋</text>
+              <text x="156" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">📦</text>
+              <text x="206" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">💬</text>
+              <text x="240" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">📊</text>
+            </svg>
+          </div>
+          <p class="mockup-caption">01 — Pointage géolocalisé</p>
+        </div>
+
+        <!-- ─────────── PHONE 2: TÂCHES / HACCP ─────────── -->
+        <div>
+          <div class="phone-frame">
+            <svg viewBox="0 0 280 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SnapOps Tâches screen">
+              <rect x="0" y="0" width="280" height="580" rx="28" fill="url(#bgP1)"/>
+
+              <!-- Status bar -->
+              <text x="20" y="24" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff">9:41</text>
+              <g transform="translate(220, 14)">
+                <rect x="0" y="2" width="3" height="6" rx="1" fill="#fff"/>
+                <rect x="5" y="0" width="3" height="8" rx="1" fill="#fff"/>
+                <rect x="10" y="-2" width="3" height="10" rx="1" fill="#fff"/>
+                <rect x="15" y="-4" width="3" height="12" rx="1" fill="#fff"/>
+                <rect x="28" y="0" width="20" height="10" rx="2" stroke="#fff" stroke-width="0.8" fill="none"/>
+                <rect x="30" y="2" width="14" height="6" rx="1" fill="#fff"/>
+              </g>
+
+              <!-- Header -->
+              <text x="20" y="68" font-family="Inter, sans-serif" font-size="22" font-weight="800" fill="#fff">Tâches</text>
+              <text x="20" y="88" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">Aujourd'hui</text>
+
+              <!-- Progress -->
+              <rect x="20" y="106" width="240" height="80" rx="14" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+              <text x="36" y="130" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">18 / 25 complétées</text>
+              <text x="36" y="166" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#fff">72%</text>
+              <!-- circle progress -->
+              <circle cx="220" cy="146" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+              <circle cx="220" cy="146" r="22" fill="none" stroke="#F08135" stroke-width="4" stroke-dasharray="100 138" stroke-linecap="round" transform="rotate(-90 220 146)"/>
+
+              <!-- Filter tabs -->
+              <rect x="20" y="200" width="60" height="26" rx="13" fill="#F08135"/>
+              <text x="50" y="217" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#fff" text-anchor="middle">Toutes (25)</text>
+              <text x="100" y="217" font-family="Inter, sans-serif" font-size="10" font-weight="500" fill="#a8acb8" text-anchor="middle">En retard (2)</text>
+              <text x="170" y="217" font-family="Inter, sans-serif" font-size="10" font-weight="500" fill="#a8acb8" text-anchor="middle">À faire (5)</text>
+
+              <!-- Task: Ouverture cuisine -->
+              <rect x="20" y="240" width="240" height="56" rx="12" fill="#1a1d26"/>
+              <rect x="32" y="262" width="14" height="14" rx="3" fill="#22c55e"/>
+              <path d="M35 269 L37 271 L43 265" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="56" y="262" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff" text-decoration="line-through" opacity="0.7">Ouverture cuisine</text>
+              <text x="56" y="278" font-family="Inter, sans-serif" font-size="9" fill="#5c5a66">06:00 · Fait</text>
+              <text x="244" y="270" font-family="Inter, sans-serif" font-size="11" fill="#22c55e" text-anchor="end">✓</text>
+
+              <!-- Task: Contrôle températures -->
+              <rect x="20" y="304" width="240" height="56" rx="12" fill="#1a1d26"/>
+              <rect x="32" y="326" width="14" height="14" rx="3" fill="#22c55e"/>
+              <path d="M35 333 L37 335 L43 329" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <text x="56" y="326" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff" text-decoration="line-through" opacity="0.7">Contrôle températures</text>
+              <text x="56" y="342" font-family="Inter, sans-serif" font-size="9" fill="#5c5a66">07:00 · Fait</text>
+
+              <!-- Task: Mise en place salle (RETARD) -->
+              <rect x="20" y="368" width="240" height="56" rx="12" fill="rgba(244,114,182,0.06)" stroke="rgba(244,114,182,0.2)"/>
+              <rect x="32" y="390" width="14" height="14" rx="3" fill="none" stroke="#f472b6" stroke-width="1.5"/>
+              <text x="56" y="390" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff">Mise en place salle</text>
+              <text x="56" y="406" font-family="Inter, sans-serif" font-size="9" fill="#f472b6">08:30 · En retard</text>
+              <rect x="216" y="384" width="32" height="20" rx="10" fill="rgba(244,114,182,0.2)"/>
+              <text x="232" y="398" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#f472b6" text-anchor="middle">!</text>
+
+              <!-- Task: Inventaire bar -->
+              <rect x="20" y="432" width="240" height="56" rx="12" fill="#1a1d26"/>
+              <rect x="32" y="454" width="14" height="14" rx="3" fill="none" stroke="#5c5a66" stroke-width="1.5"/>
+              <text x="56" y="454" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#fff">Inventaire bar</text>
+              <text x="56" y="470" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">10:00 · À faire</text>
+
+              <!-- Bottom tab bar -->
+              <rect x="20" y="510" width="240" height="56" rx="20" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+              <text x="50" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">⏱</text>
+              <circle cx="100" cy="538" r="14" fill="rgba(240,129,53,0.15)"/>
+              <text x="100" y="542" font-family="Inter, sans-serif" font-size="11" fill="#F08135" text-anchor="middle">📋</text>
+              <text x="156" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">📦</text>
+              <text x="206" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">💬</text>
+              <text x="240" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">📊</text>
+            </svg>
+          </div>
+          <p class="mockup-caption">02 — Tâches & HACCP</p>
+        </div>
+
+        <!-- ─────────── PHONE 3: FEED D'ÉQUIPE ─────────── -->
+        <div>
+          <div class="phone-frame">
+            <svg viewBox="0 0 280 580" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SnapOps Feed screen">
+              <rect x="0" y="0" width="280" height="580" rx="28" fill="url(#bgP1)"/>
+
+              <!-- Status bar -->
+              <text x="20" y="24" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff">9:41</text>
+              <g transform="translate(220, 14)">
+                <rect x="0" y="2" width="3" height="6" rx="1" fill="#fff"/>
+                <rect x="5" y="0" width="3" height="8" rx="1" fill="#fff"/>
+                <rect x="10" y="-2" width="3" height="10" rx="1" fill="#fff"/>
+                <rect x="15" y="-4" width="3" height="12" rx="1" fill="#fff"/>
+                <rect x="28" y="0" width="20" height="10" rx="2" stroke="#fff" stroke-width="0.8" fill="none"/>
+                <rect x="30" y="2" width="14" height="6" rx="1" fill="#fff"/>
+              </g>
+
+              <!-- Header -->
+              <text x="20" y="68" font-family="Inter, sans-serif" font-size="22" font-weight="800" fill="#fff">Feed</text>
+              <text x="20" y="88" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">Équipe Maarif</text>
+
+              <!-- Publish button -->
+              <rect x="200" y="64" width="60" height="28" rx="14" fill="#F08135"/>
+              <text x="230" y="82" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff" text-anchor="middle">Publier</text>
+
+              <!-- Unread alert -->
+              <rect x="20" y="106" width="240" height="36" rx="10" fill="rgba(240,129,53,0.08)" stroke="rgba(240,129,53,0.2)"/>
+              <circle cx="38" cy="124" r="9" fill="#F08135"/>
+              <text x="38" y="128" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+              <text x="56" y="129" font-family="Inter, sans-serif" font-size="11" font-weight="500" fill="#fff">3 nouveaux messages non lus</text>
+
+              <!-- Post 1: Sarah M. (Pinned) -->
+              <rect x="20" y="158" width="240" height="118" rx="12" fill="#1a1d26"/>
+              <circle cx="40" cy="180" r="14" fill="#6366f1"/>
+              <text x="40" y="185" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">SM</text>
+              <text x="62" y="178" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff">Sarah M.</text>
+              <rect x="115" y="170" width="40" height="14" rx="7" fill="rgba(240,129,53,0.15)"/>
+              <text x="135" y="180" font-family="Inter, sans-serif" font-size="8" font-weight="600" fill="#F08135" text-anchor="middle">Épinglé</text>
+              <text x="62" y="192" font-family="Inter, sans-serif" font-size="9" fill="#5c5a66">Manager · Il y a 12 min</text>
+              <text x="20" y="222" font-family="Inter, sans-serif" font-size="10" fill="#d4d4d8">
+                <tspan x="32" dy="0">Rappel équipe : nouvelle procédure</tspan>
+                <tspan x="32" dy="14">d'ouverture en vigueur dès demain.</tspan>
+                <tspan x="32" dy="14">Consultez le document en pièce jointe.</tspan>
+              </text>
+              <text x="32" y="266" font-family="Inter, sans-serif" font-size="10" fill="#a8acb8">♡ 5</text>
+              <text x="62" y="266" font-family="Inter, sans-serif" font-size="10" fill="#a8acb8">💬 3</text>
+
+              <!-- Post 2: Karim L. -->
+              <rect x="20" y="288" width="240" height="86" rx="12" fill="#1a1d26"/>
+              <circle cx="40" cy="310" r="14" fill="#f472b6"/>
+              <text x="40" y="315" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">KL</text>
+              <text x="62" y="308" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff">Karim L.</text>
+              <text x="62" y="322" font-family="Inter, sans-serif" font-size="9" fill="#5c5a66">Cuisinier · Il y a 45 min</text>
+              <text x="20" y="346" font-family="Inter, sans-serif" font-size="10" fill="#d4d4d8">
+                <tspan x="32" dy="0">Menu du jour mis à jour : tajine</tspan>
+                <tspan x="32" dy="14">poulet-olives + salade marocaine</tspan>
+              </text>
+
+              <!-- Post 3: SnapOps system alert -->
+              <rect x="20" y="386" width="240" height="86" rx="12" fill="rgba(244,114,182,0.06)" stroke="rgba(244,114,182,0.15)"/>
+              <circle cx="40" cy="408" r="14" fill="#F08135"/>
+              <text x="40" y="413" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">S</text>
+              <text x="62" y="406" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff">SnapOps</text>
+              <rect x="115" y="398" width="42" height="14" rx="7" fill="rgba(244,114,182,0.15)"/>
+              <text x="136" y="408" font-family="Inter, sans-serif" font-size="8" font-weight="600" fill="#f472b6" text-anchor="middle">Système</text>
+              <text x="62" y="420" font-family="Inter, sans-serif" font-size="9" fill="#5c5a66">Alerte automatique · Il y a 1h</text>
+              <text x="20" y="444" font-family="Inter, sans-serif" font-size="10" fill="#d4d4d8">
+                <tspan x="32" dy="0">Alerte stock : Saumon frais en dessous</tspan>
+                <tspan x="32" dy="14">du seuil critique (1/3 restant)</tspan>
+              </text>
+
+              <!-- Lu par avatars -->
+              <text x="20" y="490" font-family="Inter, sans-serif" font-size="9" fill="#a8acb8">Lu par 6 personnes</text>
+              <circle cx="138" cy="487" r="8" fill="#F08135" stroke="#0a0b0f" stroke-width="2"/>
+              <text x="138" y="490" font-family="Inter, sans-serif" font-size="7" font-weight="700" fill="#fff" text-anchor="middle">YK</text>
+              <circle cx="152" cy="487" r="8" fill="#6366f1" stroke="#0a0b0f" stroke-width="2"/>
+              <text x="152" y="490" font-family="Inter, sans-serif" font-size="7" font-weight="700" fill="#fff" text-anchor="middle">AN</text>
+              <circle cx="166" cy="487" r="8" fill="#f472b6" stroke="#0a0b0f" stroke-width="2"/>
+              <text x="166" y="490" font-family="Inter, sans-serif" font-size="7" font-weight="700" fill="#fff" text-anchor="middle">KL</text>
+
+              <!-- Bottom tab bar -->
+              <rect x="20" y="510" width="240" height="56" rx="20" fill="#1a1d26" stroke="rgba(255,255,255,0.05)"/>
+              <text x="50" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">⏱</text>
+              <text x="100" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">📋</text>
+              <text x="156" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">📦</text>
+              <circle cx="206" cy="538" r="14" fill="rgba(240,129,53,0.15)"/>
+              <text x="206" y="542" font-family="Inter, sans-serif" font-size="11" fill="#F08135" text-anchor="middle">💬</text>
+              <text x="240" y="544" font-family="Inter, sans-serif" font-size="14" fill="#5c5a66" text-anchor="middle">📊</text>
+            </svg>
+          </div>
+          <p class="mockup-caption">03 — Feed d'équipe</p>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- ═══════════════════════════════════════════════════════════
+       PROCESS
+  ═══════════════════════════════════════════════════════════ -->
   <section class="content-section">
     <div class="container">
-      <div class="image-grid">
-        <div class="image-placeholder">Landing page hero & before/after section</div>
-        <div class="image-placeholder">Feature modules — pointage, stocks, tasks</div>
-        <div class="image-placeholder">AI assistant chat interface</div>
-        <div class="image-placeholder">Pricing tiers & sector cards</div>
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">05</span> Process</div>
+        <h2 class="section-heading">Designing for complexity, delivering <span class="accent">simplicity</span></h2>
+      </div>
+
+      <div class="process-grid reveal">
+        <div class="process-step">
+          <div class="process-step-num">01</div>
+          <h3>Product Audit</h3>
+          <p>Mapped all 6 modules (pointage, tasks, stocks, feed, analytics, AI assistant) and defined the feature hierarchy for the landing page narrative.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">02</div>
+          <h3>Information Architecture</h3>
+          <p>Structured the landing page as a conversion funnel: hero → problem → solution → features → sectors → pricing → CTA. Each section answers one objection.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">03</div>
+          <h3>UI Design</h3>
+          <p>High-fidelity designs in Figma. Dark theme with embedded product mockups, interactive pricing cards, and sector-specific imagery. Mobile-first responsive.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">04</div>
+          <h3>Handoff & Iteration</h3>
+          <p>Delivered annotated specs for Next.js implementation. Iterated on the AI assistant section and pricing tier presentation based on stakeholder feedback.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="content-section reveal">
+  <!-- ═══════════════════════════════════════════════════════════
+       MOCKUP 3 — TARIFS / PRICING
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="mockup-section">
     <div class="container">
-      <div class="section-label"><span class="num">04</span> Impact</div>
-      <h2>A SaaS landing page that <span class="accent">converts</span></h2>
-      <div class="impact-grid">
-        <div class="impact-stat"><div class="number">6</div><div class="label">Product modules showcased</div></div>
-        <div class="impact-stat"><div class="number">14+</div><div class="label">Industry verticals addressed</div></div>
-        <div class="impact-stat"><div class="number">100%</div><div class="label">Mobile-first responsive</div></div>
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">06</span> Tarifs</div>
+        <h2 class="mockup-heading">Pricing, simple and transparent</h2>
+        <p class="mockup-subheading">
+          Four tiers with progressive feature unlocks. Each card uses the same structural rhythm so visitors
+          can compare top-to-bottom in seconds — and the "Pro" tier carries a subtle glow as the recommended plan.
+        </p>
+      </div>
+
+      <div class="mockup-frame reveal">
+        <svg viewBox="0 0 1400 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SnapOps pricing section">
+          <defs>
+            <linearGradient id="pricingBg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#0e1014"/>
+              <stop offset="100%" stop-color="#0a0b0f"/>
+            </linearGradient>
+            <linearGradient id="proCardGlow" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(240,129,53,0.12)"/>
+              <stop offset="100%" stop-color="rgba(240,129,53,0)"/>
+            </linearGradient>
+          </defs>
+
+          <rect x="0" y="0" width="1400" height="720" fill="url(#pricingBg)"/>
+
+          <!-- Section header -->
+          <text x="60" y="68" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#F08135" letter-spacing="0.5">TARIFS</text>
+          <text x="60" y="120" font-family="Inter, sans-serif" font-size="40" font-weight="800" fill="#fff" letter-spacing="-1.5">
+            Simple, transparent, sans surprise
+          </text>
+
+          <!-- Toggle Mensuel/Annuel -->
+          <rect x="540" y="160" width="320" height="40" rx="20" fill="#1a1d26" stroke="rgba(255,255,255,0.06)"/>
+          <rect x="544" y="164" width="156" height="32" rx="16" fill="#F08135"/>
+          <text x="622" y="186" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Mensuel</text>
+          <text x="780" y="186" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#a8acb8" text-anchor="middle">Annuel −20%</text>
+
+          <!-- ═══ STARTER CARD ═══ -->
+          <g transform="translate(60, 230)">
+            <rect x="0" y="0" width="300" height="440" rx="16" fill="#16181f" stroke="rgba(255,255,255,0.06)"/>
+            <text x="24" y="40" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#fff">Starter</text>
+            <text x="24" y="62" font-family="Inter, sans-serif" font-size="12" fill="#a8acb8">Équipe unique, premiers pas</text>
+
+            <!-- User selector -->
+            <rect x="24" y="80" width="252" height="36" rx="8" fill="#0d0f14" stroke="rgba(255,255,255,0.06)"/>
+            <text x="36" y="103" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">10 utilisateurs</text>
+            <path d="M256 100 L262 94 L268 100" stroke="#a8acb8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+            <!-- Price -->
+            <text x="24" y="170" font-family="Inter, sans-serif" font-size="44" font-weight="800" fill="#fff" letter-spacing="-1.5">600</text>
+            <text x="120" y="170" font-family="Inter, sans-serif" font-size="14" fill="#a8acb8">DHS/mois</text>
+            <text x="24" y="194" font-family="Inter, sans-serif" font-size="11" fill="#5c5a66">Facturé 7 200 DHS/an</text>
+
+            <!-- Features -->
+            <g font-family="Inter, sans-serif" font-size="12" fill="#d4d4d8">
+              <circle cx="34" cy="226" r="3" fill="#F08135"/>
+              <text x="48" y="230">Pointage géolocalisé</text>
+              <circle cx="34" cy="252" r="3" fill="#F08135"/>
+              <text x="48" y="256">Tâches &amp; checklists</text>
+              <circle cx="34" cy="278" r="3" fill="#F08135"/>
+              <text x="48" y="282">Feed équipe</text>
+              <circle cx="34" cy="304" r="3" fill="#F08135"/>
+              <text x="48" y="308">HACCP compliance</text>
+              <circle cx="34" cy="330" r="3" fill="#F08135"/>
+              <text x="48" y="334">Crédits IA · 10/user</text>
+            </g>
+
+            <!-- CTA -->
+            <rect x="24" y="370" width="252" height="44" rx="22" fill="none" stroke="rgba(255,255,255,0.15)"/>
+            <text x="150" y="397" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Voir le détail</text>
+          </g>
+
+          <!-- ═══ PRO CARD (highlighted) ═══ -->
+          <g transform="translate(380, 210)">
+            <!-- Outer glow -->
+            <rect x="-2" y="-2" width="304" height="464" rx="18" fill="url(#proCardGlow)" filter="blur(8px)"/>
+            <rect x="0" y="0" width="300" height="460" rx="16" fill="#1a1d26" stroke="#F08135" stroke-width="1.5"/>
+
+            <!-- Recommended badge -->
+            <rect x="180" y="-12" width="100" height="24" rx="12" fill="#F08135"/>
+            <text x="230" y="3" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">RECOMMANDÉ</text>
+
+            <text x="24" y="40" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#fff">Pro</text>
+            <text x="24" y="62" font-family="Inter, sans-serif" font-size="12" fill="#a8acb8">Intelligence opérationnelle</text>
+
+            <rect x="24" y="80" width="252" height="36" rx="8" fill="#0d0f14" stroke="rgba(255,255,255,0.06)"/>
+            <text x="36" y="103" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">50 utilisateurs</text>
+            <path d="M256 100 L262 94 L268 100" stroke="#a8acb8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+            <text x="24" y="170" font-family="Inter, sans-serif" font-size="44" font-weight="800" fill="#fff" letter-spacing="-1.5">4 950</text>
+            <text x="160" y="170" font-family="Inter, sans-serif" font-size="14" fill="#a8acb8">DHS/mois</text>
+            <text x="24" y="194" font-family="Inter, sans-serif" font-size="11" fill="#5c5a66">Facturé 59 400 DHS/an</text>
+
+            <g font-family="Inter, sans-serif" font-size="12" fill="#d4d4d8">
+              <text x="34" y="232" font-weight="600" fill="#F08135">Tout Starter +</text>
+              <circle cx="34" cy="252" r="3" fill="#F08135"/>
+              <text x="48" y="256">Scan IA stocks</text>
+              <circle cx="34" cy="278" r="3" fill="#F08135"/>
+              <text x="48" y="282">Analytics &amp; exports</text>
+              <circle cx="34" cy="304" r="3" fill="#F08135"/>
+              <text x="48" y="308">Multi-établissements · 3 sites</text>
+              <circle cx="34" cy="330" r="3" fill="#F08135"/>
+              <text x="48" y="334">Crédits IA · 15/user</text>
+            </g>
+
+            <rect x="24" y="370" width="252" height="44" rx="22" fill="#F08135"/>
+            <text x="150" y="397" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Voir le détail</text>
+          </g>
+
+          <!-- ═══ BUSINESS CARD ═══ -->
+          <g transform="translate(700, 230)">
+            <rect x="0" y="0" width="300" height="440" rx="16" fill="#16181f" stroke="rgba(255,255,255,0.06)"/>
+            <text x="24" y="40" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#fff">Business</text>
+            <text x="24" y="62" font-family="Inter, sans-serif" font-size="12" fill="#a8acb8">Chaîne &amp; multi-sites</text>
+
+            <rect x="24" y="80" width="252" height="36" rx="8" fill="#0d0f14" stroke="rgba(255,255,255,0.06)"/>
+            <text x="36" y="103" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">100 utilisateurs</text>
+            <path d="M256 100 L262 94 L268 100" stroke="#a8acb8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+            <text x="24" y="170" font-family="Inter, sans-serif" font-size="44" font-weight="800" fill="#fff" letter-spacing="-1.5">9 900</text>
+            <text x="160" y="170" font-family="Inter, sans-serif" font-size="14" fill="#a8acb8">DHS/mois</text>
+            <text x="24" y="194" font-family="Inter, sans-serif" font-size="11" fill="#5c5a66">Facturé 118 800 DHS/an</text>
+
+            <g font-family="Inter, sans-serif" font-size="12" fill="#d4d4d8">
+              <text x="34" y="232" font-weight="600" fill="#F08135">Tout Pro +</text>
+              <circle cx="34" cy="252" r="3" fill="#F08135"/>
+              <text x="48" y="256">Multi-établissements illimité</text>
+              <circle cx="34" cy="278" r="3" fill="#F08135"/>
+              <text x="48" y="282">Comparatif inter-sites</text>
+              <circle cx="34" cy="304" r="3" fill="#F08135"/>
+              <text x="48" y="308">Stockage 2 GB/user</text>
+              <circle cx="34" cy="330" r="3" fill="#F08135"/>
+              <text x="48" y="334">Support dédié 4h</text>
+            </g>
+
+            <rect x="24" y="370" width="252" height="44" rx="22" fill="none" stroke="rgba(255,255,255,0.15)"/>
+            <text x="150" y="397" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Voir le détail</text>
+          </g>
+
+          <!-- ═══ ENTERPRISE CARD ═══ -->
+          <g transform="translate(1020, 230)">
+            <rect x="0" y="0" width="300" height="440" rx="16" fill="#16181f" stroke="rgba(255,255,255,0.06)"/>
+            <text x="24" y="40" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#fff">Enterprise</text>
+            <text x="24" y="62" font-family="Inter, sans-serif" font-size="12" fill="#a8acb8">Groupes &amp; grandes structures</text>
+
+            <rect x="24" y="80" width="252" height="36" rx="8" fill="#0d0f14" stroke="rgba(255,255,255,0.06)"/>
+            <text x="36" y="103" font-family="Inter, sans-serif" font-size="11" fill="#a8acb8">&gt; 1 000 utilisateurs</text>
+
+            <text x="24" y="170" font-family="Inter, sans-serif" font-size="32" font-weight="800" fill="#fff" letter-spacing="-1">Sur devis</text>
+            <text x="24" y="194" font-family="Inter, sans-serif" font-size="11" fill="#5c5a66">Tarif adapté à votre volume</text>
+
+            <g font-family="Inter, sans-serif" font-size="12" fill="#d4d4d8">
+              <text x="34" y="232" font-weight="600" fill="#F08135">Tout Business +</text>
+              <circle cx="34" cy="252" r="3" fill="#F08135"/>
+              <text x="48" y="256">Users &amp; sites illimités</text>
+              <circle cx="34" cy="278" r="3" fill="#F08135"/>
+              <text x="48" y="282">Intégrations POS &amp; compta</text>
+              <circle cx="34" cy="304" r="3" fill="#F08135"/>
+              <text x="48" y="308">SSO / SAML · SLA 99.9%</text>
+              <circle cx="34" cy="330" r="3" fill="#F08135"/>
+              <text x="48" y="334">Account manager dédié</text>
+            </g>
+
+            <rect x="24" y="370" width="252" height="44" rx="22" fill="none" stroke="rgba(255,255,255,0.15)"/>
+            <text x="150" y="397" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#fff" text-anchor="middle">Nous contacter</text>
+          </g>
+        </svg>
+      </div>
+      <p class="mockup-caption">snapops.ma/landing — Tarifs section, 4-tier structure</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       IMPACT
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">07</span> Impact</div>
+        <h2 class="section-heading">A SaaS landing page that <span class="accent">converts</span></h2>
+      </div>
+
+      <div class="impact-grid reveal">
+        <div class="impact-stat">
+          <div class="impact-number">−40%</div>
+          <div class="impact-label">Temps de saisie</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-number">−60%</div>
+          <div class="impact-label">Écarts de stock</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-number">100%</div>
+          <div class="impact-label">Conformité HACCP</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-number">5 min</div>
+          <div class="impact-label">Inventaire flash</div>
+        </div>
+      </div>
+
+      <div class="reveal" style="margin-top: 64px;">
+        <div class="mockup-section-label" style="margin-bottom: 16px;"><span class="num">08</span> Toolkit</div>
+        <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; letter-spacing: -0.02em;">What I used</h3>
+        <div class="toolkit-chips">
+          <span class="toolkit-chip">Figma</span>
+          <span class="toolkit-chip">Prototyping</span>
+          <span class="toolkit-chip">Design System</span>
+          <span class="toolkit-chip">Landing Page Design</span>
+          <span class="toolkit-chip">SaaS UI</span>
+          <span class="toolkit-chip">Responsive Design</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="content-section reveal">
-    <div class="container">
-      <div class="section-label"><span class="num">05</span> Toolkit</div>
-      <h2>What I used</h2>
-      <div class="tools-list">
-        <span>Figma</span><span>Prototyping</span><span>Design System</span><span>Landing Page Design</span><span>SaaS UI</span><span>Responsive Design</span>
-      </div>
-    </div>
-  </section>
-
-  <div class="next-project">
-    <div class="container">
+  <!-- ═══════════════════════════════════════════════════════════
+       NEXT PROJECT
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="next-project">
+    <div class="container reveal">
       <div class="next-project-label">Next Project</div>
-      <a href="project-vgk-karting.html">VGK Village Karting →</a>
+      <h2 class="next-project-title">VGK Village Karting</h2>
+      <a href="project-vgk-karting.html">View case study →</a>
     </div>
-  </div>
+  </section>
 
-  <footer class="footer"><div class="container"><div class="footer-inner"><div class="footer-copy">© 2026 amadesign — Designed & built with intention.</div></div></div></footer>
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-copy">© 2026 amadesign — Designed &amp; built with intention.</div>
+      </div>
+    </div>
+  </footer>
 
   <script>
-    document.getElementById('hamburger').addEventListener('click', () => { document.getElementById('navLinks').classList.toggle('open'); });
-    document.getElementById('navLinks').querySelectorAll('a').forEach(l => l.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open')));
-    const ro = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } }); }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    // Navbar scroll
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    });
+
+    // Mobile nav toggle
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+
+    // Reveal observer
+    const ro = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          ro.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
     document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
   </script>
 </body>
