@@ -817,8 +817,47 @@
 
     .work-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 5fr 4fr;
+      grid-template-rows: auto auto;
       gap: 24px;
+    }
+
+    /* Hero project spans full height of the right column */
+    .project-card.is-hero {
+      grid-row: 1 / 3;
+      display: flex;
+      flex-direction: column;
+    }
+    .project-card.is-hero .project-thumbnail {
+      aspect-ratio: auto;
+      flex: 1;
+      min-height: 520px;
+    }
+    .project-card.is-hero .project-thumbnail-bg {
+      font-size: clamp(3rem, 5vw, 5rem);
+    }
+    .project-card.is-hero .project-title {
+      font-size: 1.6rem;
+    }
+    .project-card.is-hero .project-info {
+      padding: 36px;
+    }
+
+    /* Side cards keep the standard aspect ratio */
+    .project-card.is-side .project-thumbnail {
+      aspect-ratio: 16 / 10;
+    }
+
+    /* Full-width row spans both columns */
+    .project-card.is-wide {
+      grid-column: 1 / -1;
+    }
+    .project-card.is-wide .project-thumbnail {
+      aspect-ratio: 21 / 9;
+      min-height: 280px;
+    }
+    .project-card.is-wide .project-thumbnail-bg {
+      font-size: clamp(2.5rem, 4vw, 4rem);
     }
 
     .project-card {
@@ -1737,6 +1776,19 @@
       .work-grid {
         grid-template-columns: 1fr;
       }
+      .project-card.is-hero {
+        grid-row: auto;
+      }
+      .project-card.is-hero .project-thumbnail {
+        min-height: 320px;
+      }
+      .project-card.is-wide {
+        grid-column: auto;
+      }
+      .project-card.is-wide .project-thumbnail {
+        aspect-ratio: 16 / 10;
+        min-height: auto;
+      }
 
       .footer-inner {
         flex-direction: column;
@@ -2445,8 +2497,8 @@
       </div>
 
       <div class="work-grid stagger">
-        <!-- Project 1: SnapOps -->
-        <a href="project-snapops.html" class="project-card">
+        <!-- Project 1: SnapOps — HERO (spans full height, leads the grid) -->
+        <a href="project-snapops.html" class="project-card is-hero">
           <div class="project-thumbnail">
             <div class="project-thumbnail-bg p1">SnapOps</div>
             <span class="project-category">Product Design · SaaS · Web App</span>
@@ -2463,8 +2515,8 @@
           </div>
         </a>
 
-        <!-- Project 2: VGK Village -->
-        <a href="project-vgk-karting.html" class="project-card">
+        <!-- Project 2: VGK Village — SIDE (right column, top) -->
+        <a href="project-vgk-karting.html" class="project-card is-side">
           <div class="project-thumbnail">
             <img src="assets/vgk_screen.png" alt="VGK Village — Karting Website">
             <span class="project-category">UX / UI · Web Design</span>
@@ -2481,8 +2533,8 @@
           </div>
         </a>
 
-        <!-- Project 3: Manuka Honey -->
-        <a href="project-manuka-honey.html" class="project-card">
+        <!-- Project 3: Manuka Honey — SIDE (right column, bottom) -->
+        <a href="project-manuka-honey.html" class="project-card is-side">
           <div class="project-thumbnail">
             <img src="assets/Makunahoney_screen.png" alt="Manuka Honey — E-Commerce Redesign">
             <span class="project-category">Product · Brand · E-Commerce</span>
@@ -2499,8 +2551,8 @@
           </div>
         </a>
 
-        <!-- Project 4: Skillz-up -->
-        <a href="project-skillzup.html" class="project-card">
+        <!-- Project 4: Skillz-up — WIDE (spans both columns, bottom) -->
+        <a href="project-skillzup.html" class="project-card is-wide">
           <div class="project-thumbnail">
             <img src="assets/Skillzup_screen.png" alt="Skillz-up — SaaS Platform">
             <span class="project-category">Product Design · SaaS</span>
