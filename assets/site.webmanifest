@@ -1,0 +1,35 @@
+{
+  "name": "amadesign — Mohamed Amine",
+  "short_name": "amadesign",
+  "description": "UX/UI & Graphic Designer — clear, intentional digital products that perform.",
+  "icons": [
+    {
+      "src": "/assets/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/assets/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#c8ff00",
+  "background_color": "#0a0a0f",
+  "display": "standalone",
+  "start_url": "/"
+}
