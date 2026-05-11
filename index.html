@@ -6,6 +6,17 @@
   <title>Mohamed Amine — UX/UI & Graphic Designer</title>
 
   <!-- ═══════════════════════════════════════════════════════════════
+       FAVICONS — amadesign brand mark (lime dot on dark)
+  ═══════════════════════════════════════════════════════════════ -->
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+  <link rel="manifest" href="/assets/site.webmanifest">
+  <meta name="theme-color" content="#0a0a0f">
+
+  <!-- ═══════════════════════════════════════════════════════════════
        FONTS: Syne (display/headlines) + DM Sans (body/utility)
        A pairing that blends geometric futurism with warm readability
   ═══════════════════════════════════════════════════════════════ -->
@@ -1114,7 +1125,7 @@
       font-weight: 800;
       font-size: clamp(2rem, 4vw, 3.2rem);
       letter-spacing: -0.03em;
-      margin-bottom: 56px;
+      margin-bottom: 80px;
     }
 
     .tools-categories {
@@ -1123,17 +1134,55 @@
       gap: 24px;
     }
 
+    /* Per-category accent colors using existing tokens */
+    .tool-category { --cat: var(--accent); }
+    .tool-category:nth-child(2) { --cat: var(--accent-secondary); }
+    .tool-category:nth-child(3) { --cat: var(--accent-tertiary); }
+    .tool-category:nth-child(4) { --cat: var(--accent); }
+    .tool-category:nth-child(5) { --cat: var(--accent-secondary); }
+    .tool-category:nth-child(6) { --cat: var(--accent-tertiary); }
+
     .tool-category {
+      position: relative;
       padding: 32px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
+      overflow: hidden;
       transition: all 0.4s var(--ease-out);
     }
+
+    /* Top accent line — reveals on hover in the category color */
+    .tool-category::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 24px;
+      right: 24px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cat), transparent);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .tool-category:hover::before { opacity: 0.9; }
+
+    /* Spotlight glow following the cursor (Magic UI spotlight pattern) */
+    .tool-category::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%),
+        color-mix(in srgb, var(--cat) 10%, transparent), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    .tool-category:hover::after { opacity: 1; }
 
     .tool-category:hover {
       border-color: var(--border-hover);
       background: var(--bg-card-hover);
+      transform: translateY(-4px);
     }
 
     .tool-category-label {
@@ -1141,36 +1190,50 @@
       font-size: 0.65rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--accent);
+      color: var(--cat);
       margin-bottom: 24px;
+      position: relative;
     }
-
-    .tool-category:nth-child(2) .tool-category-label { color: var(--accent-secondary); }
-    .tool-category:nth-child(3) .tool-category-label { color: var(--accent-tertiary); }
-    .tool-category:nth-child(5) .tool-category-label { color: var(--accent-secondary); }
 
     .tool-category-icons {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 10px;
+      position: relative;
     }
 
     .tool-chip {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 16px;
+      padding: 10px 16px 10px 12px;
       border-radius: 100px;
       border: 1px solid var(--border);
       background: var(--bg-primary);
-      transition: all 0.3s var(--ease-out);
+      transition: all 0.25s var(--ease-out);
       cursor: default;
+      position: relative;
+      overflow: hidden;
     }
 
+    /* Shimmer sweep on hover (Magic UI shimmer pattern) */
+    .tool-chip::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(110deg, transparent 30%,
+        rgba(255, 255, 255, 0.08) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform 0.8s ease;
+      pointer-events: none;
+    }
+    .tool-chip:hover::before { transform: translateX(100%); }
+
     .tool-chip:hover {
-      border-color: var(--accent);
-      background: var(--accent-dim);
+      border-color: var(--cat);
+      background: color-mix(in srgb, var(--cat) 8%, var(--bg-primary));
       transform: translateY(-2px);
+      box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--cat) 40%, transparent);
     }
 
     .tool-chip-icon {
@@ -1180,22 +1243,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: transform 0.25s cubic-bezier(.34, 1.56, .64, 1);
     }
+    .tool-chip:hover .tool-chip-icon { transform: scale(1.15) rotate(-5deg); }
 
     .tool-chip-icon img,
     .tool-chip-icon svg {
       width: 22px;
       height: 22px;
-    }
-
-    /* Lucide static SVGs are black by default — invert for dark mode */
-    .tool-chip-icon img[src*="lucide-static"] {
-      filter: invert(1) brightness(0.65);
-      transition: filter 0.3s;
-    }
-
-    .tool-chip:hover .tool-chip-icon img[src*="lucide-static"] {
-      filter: invert(1) brightness(1);
+      display: block;
     }
 
     .tool-chip-name {
@@ -1206,9 +1262,48 @@
       white-space: nowrap;
       transition: color 0.3s;
     }
+    .tool-chip:hover .tool-chip-name { color: var(--text-primary); }
 
-    .tool-chip:hover .tool-chip-name {
+    /* Meta footer at the bottom of each category card */
+    .tool-category-meta {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    .tool-category-meta .meta-years { color: var(--cat); }
+
+    /* Sixth card — signature / "always learning" tile */
+    .tool-category-signature {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      background: linear-gradient(135deg,
+        color-mix(in srgb, var(--accent) 8%, transparent), transparent 60%) !important;
+    }
+    .tool-category-signature h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.6rem;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin: 0 0 12px;
       color: var(--text-primary);
+    }
+    .tool-category-signature p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin: 0;
     }
 
     @media (max-width: 1024px) {
@@ -2505,55 +2600,85 @@
           <div class="tool-category-label">Design</div>
           <div class="tool-category-icons">
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/figma.svg" alt="Figma"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#F24E1E" d="M8.5 24a4 4 0 0 0 4-4v-4h-4a4 4 0 1 0 0 8z"/><path fill="#A259FF" d="M4.5 12a4 4 0 0 1 4-4h4v8h-4a4 4 0 0 1-4-4z"/><path fill="#F24E1E" d="M4.5 4a4 4 0 0 1 4-4h4v8h-4a4 4 0 0 1-4-4z"/><path fill="#FF7262" d="M12.5 0h4a4 4 0 0 1 0 8h-4V0z"/><path fill="#1ABCFE" d="M16.5 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/></svg>
+              </div>
               <div class="tool-chip-name">Figma</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/image.svg" alt="Photoshop"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#001E36"/><path d="M6 7h3.5c2 0 3.2 1.1 3.2 2.9 0 1.9-1.3 3-3.3 3H7.6V17H6V7zm1.6 4.5h1.7c1 0 1.7-.4 1.7-1.5S10.3 8.5 9.3 8.5H7.6v3zM14.7 12.4c-.6 0-1.2-.1-1.7-.3l.2-1.2c.5.2 1 .3 1.5.3.7 0 1-.2 1-.6 0-.3-.3-.5-1.1-.7-1.3-.4-1.7-.9-1.7-1.7 0-1 .8-1.8 2.2-1.8.6 0 1.2.1 1.6.3l-.2 1.2c-.4-.2-.9-.3-1.3-.3-.6 0-.9.2-.9.5 0 .3.3.5 1.1.7 1.2.4 1.7.8 1.7 1.7-.1 1.2-.9 1.9-2.4 1.9z" fill="#31A8FF"/></svg>
+              </div>
               <div class="tool-chip-name">Photoshop</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/pen-tool.svg" alt="Illustrator"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#330000"/><path d="M11.2 14.7l-.6 2-.1.1h-1.4l-.1-.1L11 7.5h1.8l2.1 9.2-.1.2h-1.5l-.1-.1-.6-2h-1.4zM12 9.5l-.5 3.7h1.1L12 9.5zM17.5 8.8c0 .5-.3.8-.8.8s-.7-.3-.7-.8.3-.8.8-.8c.4 0 .7.3.7.8zm-1.5 8c-.1 0-.1 0 0 0l-.1-6.6.1-.1h1.4l.1.1v6.5l-.1.1H16z" fill="#FF9A00"/></svg>
+              </div>
               <div class="tool-chip-name">Illustrator</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/book-open.svg" alt="InDesign"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#330000"/><path d="M9.4 16.8H7.8l-.1-.1V7.4l.1-.1h1.5l.1.1v9.3l-.1.1zM15.7 7.3v8.1c0 .4 0 .9.1 1.3l-.1.1c-.7.3-1.5.5-2.3.5-1.9 0-3.3-1.2-3.3-3.5 0-1.9 1.3-3.4 3.1-3.4.4 0 .8.1 1 .2v-3l.1-.1h1.4v-.2zm-1.5 4.6c-.2-.1-.5-.1-.8-.1-.9 0-1.7.7-1.7 2.1 0 1.5.7 2.1 1.6 2.1.3 0 .6 0 .8-.1V11.9z" fill="#FF3366"/></svg>
+              </div>
               <div class="tool-chip-name">InDesign</div>
             </div>
+          </div>
+          <div class="tool-category-meta">
+            <span>4 Tools</span>
+            <span class="meta-years">9+ years</span>
           </div>
         </div>
 
         <!-- Motion -->
         <div class="tool-category">
-          <div class="tool-category-label">Motion & Video</div>
+          <div class="tool-category-label">Motion &amp; Video</div>
           <div class="tool-category-icons">
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/clapperboard.svg" alt="After Effects"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#00005B"/><path d="M8.6 14.9l-.6 1.8-.1.1H6.5l-.1-.1L8.3 8h2l1.9 8.7-.1.1h-1.5l-.1-.1-.6-1.8H8.6zm.9-4.5l-.6 3h1.2l-.6-3zM16.7 14.2v.4l.1.7c0 .1 0 .1-.1.1-.7.3-1.4.4-2.2.4-1.8 0-2.7-1.1-2.7-3 0-1.7.9-3.1 2.6-3.1 1.6 0 2.3 1.2 2.3 2.7 0 .5 0 .9-.1 1.1l-.1.1H13.5c0 .9.4 1.3 1.4 1.3.6 0 1.1-.1 1.6-.3.1 0 .2 0 .2.1v-.5zm-2-1.8h1.1v-.2c0-.4-.2-1-.9-1-.8 0-1 .7-1.1 1.2h.9z" fill="#9999FF"/></svg>
+              </div>
               <div class="tool-chip-name">After Effects</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/film.svg" alt="Premiere Pro"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#00005B"/><path d="M7 7.7h3c2 0 3.3 1.1 3.3 3 0 2-1.4 3.1-3.5 3.1H8.6v2.5H7V7.7zm1.6 4.6h1.4c.9 0 1.7-.3 1.7-1.5 0-1-.7-1.5-1.6-1.5H8.6v3zM14.7 10.4c.1 0 .1 0 .1.1.1.4.1.7.1 1 .3-.6 1-1.2 2-1.2.1 0 .1 0 .1.1v1.5c0 .1 0 .1-.1.1-1-.1-1.8.4-2 1v3.7l-.1.1H13.5l-.1-.1V12c0-.6 0-1.2-.1-1.5l.1-.1h1.3z" fill="#EA77FF"/></svg>
+              </div>
               <div class="tool-chip-name">Premiere Pro</div>
             </div>
+          </div>
+          <div class="tool-category-meta">
+            <span>2 Tools</span>
+            <span class="meta-years">5+ years</span>
           </div>
         </div>
 
         <!-- Web -->
         <div class="tool-category">
-          <div class="tool-category-label">Web & CMS</div>
+          <div class="tool-category-label">Web &amp; CMS</div>
           <div class="tool-category-icons">
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/globe.svg" alt="WordPress"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#21759B"/><path d="M3.5 12c0 3.4 1.9 6.3 4.8 7.7L4.2 9c-.4 1-.7 2-.7 3zm14.3-.4c0-1.1-.4-1.8-.7-2.4-.5-.7-.9-1.3-.9-2 0-.8.6-1.5 1.5-1.5h.1c-1.5-1.4-3.5-2.2-5.7-2.2-2.9 0-5.5 1.5-7 3.8h.6c.9 0 2.4-.1 2.4-.1.5 0 .5.7 0 .8 0 0-.5.1-1 .1L9.1 17l1.8-5.4L9.5 7.9c-.4 0-.9-.1-.9-.1-.5 0-.4-.8.1-.8 0 0 1.5.1 2.4.1.9 0 2.4-.1 2.4-.1.5 0 .5.7 0 .8 0 0-.5.1-1 .1l3 8.8.8-2.7c.4-1.1.7-2 .7-2.6zm-5.7 1.2L9.6 18.2c.8.2 1.6.3 2.4.3.9 0 1.9-.2 2.7-.4l-.1-.1-2.5-6.8zM19.4 7.5c0 .3.1.5.1.8 0 .8-.1 1.7-.6 2.8L16.5 18c2.5-1.4 4.1-4.1 4.1-7.1 0-1.4-.4-2.8-1-3.9-.1.1-.1.4-.2.5z" fill="#fff"/></svg>
+              </div>
               <div class="tool-chip-name">WordPress</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/blocks.svg" alt="Elementor"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="11" fill="#92003B"/><path d="M9 7h2v10H9zm4 0h2v3h-2zm0 4h2v3h-2zm0 4h2v2h-2z" fill="#fff"/></svg>
+              </div>
               <div class="tool-chip-name">Elementor</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/code.svg" alt="HTML/CSS"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 1l1.6 18.1L12 21l7.4-1.9L21 1H3z" fill="#E34F26"/><path d="M12 19.4l6-1.6 1.4-15H12z" fill="#EF652A"/><path d="M12 9.6H8.6L8.4 7H12V4.6H5.8L6 7l.6 5h5.4V9.6zm0 6.2l-2.8-.8-.2-2H6.6l.4 4 5 1.4v-2.6z" fill="#EBEBEB"/><path d="M12 9.6V12h3.2l-.4 3.4-2.8.8v2.6l5-1.4 1-11.4H12V7h5.4l-.2 2.6H12z" fill="#fff"/></svg>
+              </div>
               <div class="tool-chip-name">HTML / CSS</div>
             </div>
+          </div>
+          <div class="tool-category-meta">
+            <span>3 Tools</span>
+            <span class="meta-years">7+ years</span>
           </div>
         </div>
 
@@ -2562,41 +2687,70 @@
           <div class="tool-category-label">UX Process</div>
           <div class="tool-category-icons">
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/search.svg" alt="UX Research"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              </div>
               <div class="tool-chip-name">UX Research</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/layout.svg" alt="Wireframing"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+              </div>
               <div class="tool-chip-name">Wireframing</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/play-circle.svg" alt="Prototyping"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="#c8ff00"/></svg>
+              </div>
               <div class="tool-chip-name">Prototyping</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/grid-3x3.svg" alt="Design Systems"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#c8ff00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              </div>
               <div class="tool-chip-name">Design Systems</div>
             </div>
+          </div>
+          <div class="tool-category-meta">
+            <span>4 Methods</span>
+            <span class="meta-years">Daily</span>
           </div>
         </div>
 
         <!-- AI & Productivity -->
         <div class="tool-category">
-          <div class="tool-category-label">AI & Productivity</div>
+          <div class="tool-category-label">AI &amp; Productivity</div>
           <div class="tool-category-icons">
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/openai.svg" alt="AI Tools"></div>
-              <div class="tool-chip-name">AI Tools</div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 6.5L21 11l-6.6 2.5L12 20l-2.4-6.5L3 11l6.6-2.5L12 2z"/></svg>
+              </div>
+              <div class="tool-chip-name">Claude AI</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/@lobehub/icons-static-svg@latest/icons/notion.svg" alt="Notion"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4.5 4.2l13.8-1c1.7-.1 2.1.1 3.2 1L23 5.6c.5.4.7.5.7 1V19c0 1-.4 1.5-1.6 1.6L5 21.5c-.9 0-1.4-.1-1.9-.7L1.4 19c-.5-.7-.7-1.1-.7-1.6V5.2c0-.7.3-1.4 3.8-1z" fill="#fff" stroke="#000" stroke-width=".6"/><path d="M18.4 3.2L4.6 4.2c-.6 0-.7.3-.4.5l1.3 1c.5.4 1.1.6 2 .6l16-1c.7 0 .5-.3.3-.5L21.9 4c-1-.7-1.5-.8-3.5-.7zM4.6 6.7v13.1c0 .7.4 1 1.2 1l16-1c.8 0 .9-.5.9-1.1V5.7c0-.6-.2-.9-.7-.8l-16.7 1c-.6 0-.7.4-.7.8z" fill="#000"/></svg>
+              </div>
               <div class="tool-chip-name">Notion</div>
             </div>
             <div class="tool-chip">
-              <div class="tool-chip-icon"><img src="https://unpkg.com/lucide-static@latest/icons/terminal.svg" alt="Prompt Design"></div>
+              <div class="tool-chip-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              </div>
               <div class="tool-chip-name">Prompt Design</div>
             </div>
           </div>
+          <div class="tool-category-meta">
+            <span>3 Tools</span>
+            <span class="meta-years">Workflow</span>
+          </div>
+        </div>
+
+        <!-- Signature / Always learning -->
+        <div class="tool-category tool-category-signature">
+          <div class="tool-category-label">Always learning</div>
+          <h3>New tools every quarter.</h3>
+          <p>The stack evolves. Currently exploring Webflow, Framer, and Three.js for higher-fidelity prototypes.</p>
         </div>
       </div>
     </div>
@@ -3112,6 +3266,20 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <script>
     lucide.createIcons();
+  </script>
+
+  <!-- Toolkit: spotlight cursor tracking on category cards -->
+  <script>
+    (function(){
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.querySelectorAll('.tool-category').forEach(function(card){
+        card.addEventListener('mousemove', function(e){
+          var r = card.getBoundingClientRect();
+          card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+          card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+        });
+      });
+    })();
   </script>
 
 </body>
