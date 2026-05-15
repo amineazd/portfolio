@@ -24,9 +24,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 
-  <!-- GSAP + ScrollTrigger — drives the freestyle services section animation -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- ═══════════════════════════════════════════════════════════════
+       GSAP 3.13+ — Core, ScrollTrigger, SplitText
+       Upgraded from 3.12.5 → 3.13.0 to access the new SplitText API
+       (autoSplit, onSplit callbacks, line/word/char masking).
+       Free for everyone since Webflow acquired GSAP.
+  ═══════════════════════════════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
 
   <style>
     /* ═══════════════════════════════════════════════════════════════
@@ -176,6 +182,19 @@
     .stagger.visible > * {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       SPLITTEXT — Reveal animation prep for section headings
+       The .split-heading class marks H2s that get GSAP SplitText
+       treatment. We DON'T hide them in CSS (no opacity: 0) — GSAP
+       sets the initial state via gsap.set() so a JS failure can
+       never leave the heading invisible. Matches your services
+       section's bulletproof pattern.
+    ═══════════════════════════════════════════════════════════════ */
+    .split-heading .split-line {
+      overflow: clip;
+      display: block;
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -2520,7 +2539,7 @@
 
       <div class="about-grid">
         <div class="reveal">
-          <h2 class="about-heading">
+          <h2 class="about-heading split-heading">
             Designing with <span class="accent">purpose</span>,<br>
             not just pixels.
           </h2>
@@ -2645,7 +2664,7 @@
       <div class="section-label reveal"><span class="num">03</span> Selected Work</div>
 
       <div class="work-header reveal">
-        <h2 class="work-heading">Featured Projects</h2>
+        <h2 class="work-heading split-heading">Featured Projects</h2>
       </div>
 
       <div class="work-grid stagger">
@@ -2771,7 +2790,7 @@
     <div class="container">
       <div class="section-label reveal"><span class="num">04</span> Process</div>
 
-      <h2 class="process-heading reveal">
+      <h2 class="process-heading split-heading reveal">
         How I work.
       </h2>
 
@@ -2836,7 +2855,7 @@
     <div class="container">
       <div class="section-label reveal"><span class="num">05</span> Toolkit</div>
 
-      <h2 class="tools-heading reveal">Tools I use daily.</h2>
+      <h2 class="tools-heading split-heading reveal">Tools I use daily.</h2>
 
       <div class="tools-categories stagger">
         <!-- Design -->
@@ -2994,7 +3013,7 @@
         <div class="tool-category tool-category-signature">
           <div class="tool-category-label">Always learning</div>
           <h3>New tools every quarter.</h3>
-          <p>The stack evolves. Currently exploring Webflow, Framer, and Three.js for higher-fidelity prototypes.</p>
+          <p>The stack evolves. Currently exploring Webflow, Framer, GSAP, and Three.js for higher-fidelity prototypes.</p>
         </div>
       </div>
     </div>
@@ -3026,7 +3045,7 @@
     <div class="container">
       <div class="section-label reveal"><span class="num">06</span> Design Radar</div>
 
-      <h2 class="radar-heading reveal">What I'm currently exploring.</h2>
+      <h2 class="radar-heading split-heading reveal">What I'm currently exploring.</h2>
       <p class="radar-sub reveal">The ideas, tools, and shifts shaping how I think about design right now.</p>
 
       <div class="radar-orbs reveal">
@@ -3072,7 +3091,7 @@
       <div class="contact-inner reveal">
         <div class="section-label" style="justify-content: center;"><span class="num">07</span> Contact</div>
 
-        <h2 class="contact-heading">
+        <h2 class="contact-heading split-heading">
           Let's build<br>something <span class="accent">great</span>.
         </h2>
 
@@ -3498,11 +3517,82 @@
       }
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       SPLITTEXT — Section heading reveals
+       Animates .split-heading elements (about, work, process,
+       tools, radar, contact) with line + word stagger on scroll.
+
+       Skips: .hero-headline (custom CSS animation), .services-heading
+       (already animated by initServicesFreestyle), .lh-hero__name
+       (marquee), project wordmarks (already animated per-card).
+
+       Bulletproof pattern: gsap.set for initial state, autoSplit for
+       responsive re-splitting on resize, try/catch + clearProps
+       failsafe so a failure never leaves a heading invisible.
+    ═══════════════════════════════════════════════════════════ */
+    function initSplitHeadings() {
+      if (typeof gsap === 'undefined' || typeof SplitText === 'undefined' || typeof ScrollTrigger === 'undefined') {
+        console.warn('[splittext] GSAP / SplitText / ScrollTrigger not loaded');
+        return;
+      }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      gsap.registerPlugin(SplitText, ScrollTrigger);
+
+      const headings = document.querySelectorAll('.split-heading');
+      if (!headings.length) return;
+
+      // Wait for fonts so line breaks don't reflow after the split
+      const start = document.fonts && document.fonts.ready
+        ? document.fonts.ready
+        : Promise.resolve();
+
+      start.then(() => {
+        headings.forEach((heading) => {
+          try {
+            SplitText.create(heading, {
+              type: 'lines, words',
+              mask: 'lines',
+              linesClass: 'split-line',
+              autoSplit: true,
+              onSplit(self) {
+                // Set initial state via GSAP (never CSS) so a failure
+                // can never leave the heading invisible
+                gsap.set(self.words, { yPercent: 110, opacity: 0 });
+
+                return gsap.to(self.words, {
+                  yPercent: 0,
+                  opacity: 1,
+                  duration: 0.9,
+                  ease: 'power3.out',
+                  stagger: 0.045,
+                  scrollTrigger: {
+                    trigger: heading,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse',
+                  },
+                });
+              },
+            });
+          } catch (err) {
+            console.warn('[splittext] split failed for heading, leaving as-is:', err, heading);
+            // Failsafe — if split throws, the heading still renders normally
+          }
+        });
+
+        ScrollTrigger.refresh();
+      });
+    }
+
     // Wait for full load (preloader done + layout stable) before measuring
     if (document.readyState === 'complete') {
       initServicesFreestyle();
+      initSplitHeadings();
     } else {
-      window.addEventListener('load', initServicesFreestyle);
+      window.addEventListener('load', () => {
+        initServicesFreestyle();
+        initSplitHeadings();
+      });
     }
   </script>
 
