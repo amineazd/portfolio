@@ -523,6 +523,50 @@
       margin-top: 6px;
     }
 
+    /* The "+" suffix on the number — animates in only after the count finishes,
+       so the reveal isn't spoiled. JS toggles .is-visible when ready. */
+    .stat-number .stat-plus {
+      display: inline-block;
+      opacity: 0;
+      transform: translateX(-8px) scale(0.6);
+      transition: opacity 0.35s var(--ease-spring), transform 0.5s var(--ease-spring);
+      color: var(--accent);
+    }
+    .stat-number .stat-plus.is-visible {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+
+    /* Context line — quiet narrative beneath the existing label.
+       Each character types in via JS once the counter finishes. */
+    .stat-context {
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      opacity: 0.6;
+      margin-top: 4px;
+      min-height: 0.75rem; /* reserves space so layout doesn't jump when text types in */
+      overflow: hidden;
+      display: block;
+    }
+    .stat-context .ctx-char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.3s var(--ease-out);
+    }
+    .stat-context .ctx-char.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Render literal spaces as non-breaking so the inline-block chars don't collapse */
+    .stat-context .ctx-space {
+      display: inline-block;
+      width: 0.3em;
+    }
+
     /* Scroll indicator */
     .scroll-indicator {
       position: absolute;
@@ -2484,16 +2528,19 @@
 
         <div class="hero-stats">
           <div class="stat">
-            <div class="stat-number" data-count="9">0</div>
+            <div class="stat-number" data-count="9"><span class="stat-num-value">0</span><span class="stat-plus">+</span></div>
             <div class="stat-label">Years Exp</div>
+            <div class="stat-context" data-context="since 2017"></div>
           </div>
           <div class="stat">
-            <div class="stat-number" data-count="50">0</div>
+            <div class="stat-number" data-count="50"><span class="stat-num-value">0</span><span class="stat-plus">+</span></div>
             <div class="stat-label">Projects</div>
+            <div class="stat-context" data-context="shipped"></div>
           </div>
           <div class="stat">
-            <div class="stat-number" data-count="30">0</div>
+            <div class="stat-number" data-count="30"><span class="stat-num-value">0</span><span class="stat-plus">+</span></div>
             <div class="stat-label">Clients</div>
+            <div class="stat-context" data-context="served"></div>
           </div>
         </div>
       </div>
@@ -3256,32 +3303,98 @@
 
     /**
      * ═══════════════════════════════════════════════════════════
-     * COUNTER ANIMATION — Animates stat numbers on scroll
-     * Uses easeOutQuart for a natural deceleration feel
+     * COUNTER ANIMATION — Number → "+" reveal → context typewriter
+     *
+     * Choreography per stat:
+     *   0.0s  → number starts counting from 0
+     *   0.0s–2.0s → number eases up to target (easeOutQuart)
+     *   2.0s  → number lands; "+" suffix springs in
+     *   2.2s  → context line types in char by char
+     *
+     * The "+" used to render alongside the count from the start, which
+     * spoiled the reveal. Now it appears only after the number lands.
+     * The context line gives each stat a quiet narrative beat without
+     * competing with the number itself.
      * ═══════════════════════════════════════════════════════════
      */
-    function animateCounter(el) {
-      const target = parseInt(el.dataset.count);
+    function animateCounter(numEl) {
+      const target = parseInt(numEl.dataset.count, 10);
       const duration = 2000;
       const startTime = performance.now();
-      const suffix = target === 9 ? '+' : '+';
+
+      const valueEl = numEl.querySelector('.stat-num-value');
+      const plusEl  = numEl.querySelector('.stat-plus');
+
+      // Find the sibling context element (same parent .stat)
+      const statEl    = numEl.closest('.stat');
+      const contextEl = statEl ? statEl.querySelector('.stat-context') : null;
 
       function update(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // easeOutQuart easing for natural feel
+        // easeOutQuart for natural deceleration
         const eased = 1 - Math.pow(1 - progress, 4);
         const current = Math.round(eased * target);
 
-        el.textContent = current + suffix;
+        if (valueEl) {
+          valueEl.textContent = current;
+        } else {
+          // Defensive fallback if the markup ever loses the inner span
+          numEl.textContent = current + '+';
+        }
 
         if (progress < 1) {
           requestAnimationFrame(update);
+        } else {
+          // Number finished landing — reveal the "+" with a slight beat
+          if (plusEl) {
+            setTimeout(() => plusEl.classList.add('is-visible'), 80);
+          }
+          // Then type the context label after the "+" has appeared
+          if (contextEl) {
+            setTimeout(() => typewriteContext(contextEl), 280);
+          }
         }
       }
 
       requestAnimationFrame(update);
+    }
+
+    /**
+     * Types the data-context string into the element one character at a
+     * time. Spaces become non-breaking inline blocks so the inline-block
+     * char spans don't collapse whitespace. Idempotent — safe to call
+     * twice (it bails if already populated).
+     */
+    function typewriteContext(el) {
+      const text = el.dataset.context || '';
+      if (!text || el.dataset.typed === 'true') return;
+      el.dataset.typed = 'true';
+
+      // Build the DOM once with all chars hidden
+      const frag = document.createDocumentFragment();
+      const chars = [];
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const span = document.createElement('span');
+        if (c === ' ') {
+          span.className = 'ctx-space';
+        } else {
+          span.className = 'ctx-char';
+          span.textContent = c;
+        }
+        frag.appendChild(span);
+        chars.push(span);
+      }
+      el.appendChild(frag);
+
+      // Reveal each char with a small stagger (~30ms per char)
+      chars.forEach((span, i) => {
+        if (span.classList.contains('ctx-char')) {
+          setTimeout(() => span.classList.add('is-visible'), i * 30);
+        }
+      });
     }
 
     // Trigger counter animation when hero stats come into view
