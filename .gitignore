@@ -1,0 +1,10 @@
+# Local Claude Code preview config
+.claude/
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
