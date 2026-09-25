@@ -63,7 +63,7 @@ portfolio/
 2. **Marquee** — Scrolling skills ticker
 3. **About** — Bio, disciplines, industries, certifications
 4. **Services** — Graphic Design, UI Design, UX Design
-5. **Selected Work** — Noor, VGK Village, Manuka Honey, Skillz-up
+5. **Selected Work** — SnapOps, VGK Village, Manuka Honey, Skillz-up
 6. **Process** — Discover → Define → Design → Deliver
 7. **Toolkit** — 16 tools with SVG brand icons
 8. **Testimonial** — Client social proof
