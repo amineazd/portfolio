@@ -21,25 +21,26 @@ Contact on site: contact@amadesign.online
 
 ## Case studies
 
-Next Project chain (circular): SnapOps → VGK → Manuka Honey → Skillz-up → SnapOps
+Next Project chain (circular): Haushaltsankauf24 → VGK → Manuka Honey → Skillz-up → Haushaltsankauf24
 
 | Page | Status |
 |---|---|
-| `project-snapops.html` | Unified system. Hero still a gradient placeholder — needs real screenshot |
+| `project-haushaltsankauf.html` | Unified system, replaced SnapOps. Needs before/after screenshots + client brief |
 | `project-skillzup.html` | Unified system. Hero `assets/Skillzup_screen.png` |
 | `project-vgk-karting.html` | **OLD system** (Playfair Display, `#e84545` red, old footer "Mohamed Amine") — migrate |
 | `project-manuka-honey.html` | **OLD system** (Playfair Display, `#c8a44e` gold, old footer) — migrate |
 
-Homepage work cards are still typographic wordmarks, not screenshots.
+Homepage cards: VGK, Manuka, Skillz-up show real mobile shots in device frames.
+Haushaltsankauf24 (hero) is still a typographic wordmark — needs a real screenshot.
 
 ## This weekend (Sept 26–27, 2026)
 
 1. Migrate VGK + Manuka Honey onto the unified system (nav, noise, tokens, fonts, GSAP, footer). Do this first so new pages build from one template.
 2. New case study: **AloCut** — barber haircut reservation product; 14-day free trial; barber onboarding questionnaire (12 questions). Start with case study structure.
-3. New case study: **Haushaltsauflösungen NRW** — household clearance site for NRW, Germany (client Gallery Jarrodi).
-   Before: haushaltsaufloesungennrw.de → After: haushaltsankauf24.de (WordPress + Elementor).
-   Must show before vs after, the problem solved, client brief vs what was built, and the UX logic behind each decision.
+3. Finish **Haushaltsankauf24** — page scaffolded (hero, overview, diagnosis, before/after intro).
+   Before: haushaltsaufloesungennrw.de → After: haushaltsankauf24.de (WordPress + Elementor), client Gallery Jarrodi.
    Still needed from Amine: before screenshots (mobile + desktop), original brief, scope confirmation.
+   Then add: before vs after visuals, client brief vs what was built, UX logic per decision.
 4. Extend the Next Project chain to include both new pages.
 5. Decide homepage card imagery now that the grid grows to 6.
 

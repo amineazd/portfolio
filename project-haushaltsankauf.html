@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haushaltsankauf24 — Household Clearance, NRW — amadesign</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       DESIGN TOKENS — synced with homepage / other case study pages
+    ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --bg-card-hover: #1c1c28;
+      --bg-elevated: #1e1e2a;
+      --text-primary: #f0eeeb;
+      --text-secondary: #9694a0;
+      --text-muted: #5c5a66;
+      --text-accent: #c8ff00;
+      --accent: #c8ff00;
+      --accent-dim: rgba(200, 255, 0, 0.12);
+      --accent-glow: rgba(200, 255, 0, 0.25);
+      --accent-secondary: #6366f1;
+      --accent-tertiary: #f472b6;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --glass: rgba(255, 255, 255, 0.03);
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --container: 1280px;
+      --radius: 16px;
+      --radius-sm: 8px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+    ::selection { background: var(--accent); color: var(--bg-primary); }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container { max-width: var(--container); margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+
+    /* Noise overlay */
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 9999; opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Reveal animations */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NAVBAR — synced with homepage
+    ═══════════════════════════════════════════════════════════════ */
+    .navbar {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      padding: 0 clamp(20px, 4vw, 48px);
+      transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+    }
+    .navbar.scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .navbar-inner {
+      max-width: var(--container); margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+    }
+    .logo {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
+      letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 12px var(--accent-glow);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.8); } }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+      color: var(--text-secondary); transition: color 0.3s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1.5px;
+      background: var(--accent); transition: width 0.3s var(--ease-out);
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      padding: 10px 24px; border: 1px solid var(--border-hover); border-radius: 100px;
+      font-size: 0.85rem; font-weight: 500; color: var(--text-primary) !important;
+      transition: all 0.3s var(--ease-out);
+    }
+    .nav-cta:hover { background: var(--accent); color: var(--bg-primary) !important; border-color: var(--accent); }
+    .nav-cta:hover::after { display: none; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 8px; }
+    .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--text-primary); transition: all 0.3s var(--ease-out); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PROJECT HERO
+    ═══════════════════════════════════════════════════════════════ */
+    .project-hero {
+      padding: 160px 0 80px;
+      position: relative;
+    }
+    .project-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 60% 60% at 50% 30%, black, transparent);
+      pointer-events: none;
+    }
+    .project-hero-content { position: relative; z-index: 2; }
+
+    .project-category-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 100px;
+      background: var(--accent-dim); border: 1px solid rgba(200, 255, 0, 0.15);
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .project-headline {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      line-height: 1; letter-spacing: -0.04em;
+      margin-bottom: 32px;
+      max-width: 900px;
+    }
+    .project-headline .accent { color: var(--accent); font-style: italic; }
+    .project-intro {
+      max-width: 720px; font-size: 1.15rem;
+      color: var(--text-secondary); line-height: 1.7;
+      margin-bottom: 48px;
+    }
+    .project-cta-row {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 80px;
+    }
+    .live-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px; border-radius: 100px;
+      background: var(--accent); color: var(--bg-primary);
+      font-weight: 600; font-size: 0.95rem;
+      transition: all 0.3s var(--ease-out);
+    }
+    .live-link:hover { box-shadow: 0 8px 32px var(--accent-glow); transform: translateY(-2px); }
+    .live-link svg { transition: transform 0.3s; }
+    .live-link:hover svg { transform: translate(2px, -2px); }
+
+    .project-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 80px;
+    }
+    .project-meta-item {
+      padding: 28px;
+      background: var(--bg-card);
+    }
+    .meta-label {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .meta-value {
+      font-family: var(--font-display); font-weight: 600;
+      font-size: 1rem; line-height: 1.4;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MOCKUP SHOWCASE — the real screen renders
+    ═══════════════════════════════════════════════════════════════ */
+    .mockup-section { padding: 80px 0; }
+
+    .mockup-section-label {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 32px;
+    }
+    .mockup-section-label::before { content: ''; width: 32px; height: 1px; background: var(--text-muted); }
+    .mockup-section-label .num { color: var(--accent); }
+
+    .mockup-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 720px;
+    }
+    .mockup-subheading {
+      color: var(--text-secondary); font-size: 1.05rem;
+      line-height: 1.7; max-width: 640px;
+      margin-bottom: 56px;
+    }
+
+    /* Frame wrapper for SVG renders */
+    .mockup-frame {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: linear-gradient(180deg, #1a1d24 0%, #0d0f14 100%);
+      padding: clamp(16px, 3vw, 32px);
+      box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+    .mockup-frame.no-padding { padding: 0; }
+    .mockup-frame svg { display: block; width: 100%; height: auto; }
+
+    /* Mobile triptych — three phone frames side by side */
+    .mobile-triptych {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: center;
+    }
+    .phone-frame {
+      position: relative;
+      max-width: 320px;
+      margin: 0 auto;
+      border-radius: 36px;
+      background: #1a1d24;
+      padding: 12px;
+      box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+    }
+    .phone-frame::before {
+      content: ''; position: absolute;
+      top: 18px; left: 50%; transform: translateX(-50%);
+      width: 100px; height: 22px;
+      background: #000; border-radius: 100px;
+      z-index: 5;
+    }
+    .phone-frame svg {
+      width: 100%; height: auto;
+      border-radius: 28px;
+      display: block;
+    }
+
+    .mockup-caption {
+      margin-top: 24px;
+      font-family: var(--font-mono); font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       OVERVIEW / DIAGNOSIS / PROCESS sections
+    ═══════════════════════════════════════════════════════════════ */
+    .content-section { padding: 100px 0; }
+    .section-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: -0.03em; line-height: 1.1;
+      margin-bottom: 32px;
+      max-width: 720px;
+    }
+    .section-heading .accent { color: var(--accent); }
+    .body-text {
+      max-width: 760px;
+      color: var(--text-secondary);
+      font-size: 1.05rem; line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .body-text strong { color: var(--text-primary); font-weight: 500; }
+
+    .diagnosis-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      margin-top: 48px;
+    }
+    .diagnosis-card {
+      padding: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .diagnosis-card h3 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.15rem; letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .diagnosis-card h3 .icon-circle {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700;
+    }
+    .challenges h3 .icon-circle { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+    .direction h3 .icon-circle { background: var(--accent-dim); color: var(--accent); }
+    .diagnosis-card ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .diagnosis-card li {
+      color: var(--text-secondary); font-size: 0.95rem;
+      line-height: 1.6; padding-left: 20px; position: relative;
+    }
+    .diagnosis-card li::before {
+      content: ''; position: absolute; left: 0; top: 10px;
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .challenges li::before { background: #f472b6; }
+    .direction li::before { background: var(--accent); }
+
+    /* Process timeline */
+    .process-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      margin-top: 48px;
+    }
+    .process-step {
+      padding: 32px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.4s var(--ease-out);
+    }
+    .process-step:hover { background: var(--bg-card-hover); border-color: var(--border-hover); transform: translateY(-4px); }
+    .process-step-num {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: 2.5rem; color: var(--accent-dim); line-height: 1;
+      margin-bottom: 16px;
+    }
+    .process-step h3 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.1rem; margin-bottom: 12px;
+    }
+    .process-step p { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.7; }
+
+    /* Impact stats */
+    .impact-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: var(--border); border-radius: var(--radius); overflow: hidden;
+      margin-top: 48px;
+    }
+    .impact-stat { padding: 40px 28px; background: var(--bg-card); text-align: left; }
+    .impact-number {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.03em; color: var(--accent);
+      line-height: 1; margin-bottom: 10px;
+    }
+    .impact-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-secondary); text-transform: uppercase; }
+
+    /* Toolkit chips */
+    .toolkit-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .toolkit-chip {
+      padding: 10px 18px; border-radius: 100px;
+      border: 1px solid var(--border-hover);
+      font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* Next project */
+    .next-project {
+      padding: 100px 0; border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .next-project-label {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 16px;
+    }
+    .next-project-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .next-project a {
+      display: inline-flex; align-items: center; gap: 12px;
+      color: var(--accent); font-size: 1.1rem; font-weight: 500;
+      transition: gap 0.3s var(--ease-out);
+    }
+    .next-project a:hover { gap: 20px; }
+
+    /* Footer */
+    .footer { padding: 40px 0; border-top: 1px solid var(--border); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-muted); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .project-meta-grid { grid-template-columns: repeat(2, 1fr); }
+      .process-grid { grid-template-columns: repeat(2, 1fr); }
+      .impact-grid { grid-template-columns: repeat(2, 1fr); }
+      .mobile-triptych { grid-template-columns: 1fr; gap: 32px; }
+      .phone-frame { max-width: 280px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none; position: fixed; top: 72px; left: 0; width: 100%;
+        background: rgba(10, 10, 15, 0.97); backdrop-filter: blur(20px);
+        flex-direction: column; padding: 32px; gap: 24px;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+      .diagnosis-grid { grid-template-columns: 1fr; }
+      .project-meta-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="noise-overlay"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       NAVIGATION
+  ═══════════════════════════════════════════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-dot"></span>
+        amadesign.
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="about.html">About</a></li>
+        <li><a href="index.html#work">Work</a></li>
+        <li><a href="index.html#contact" class="nav-cta">Let's Talk</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <!-- ═══════════════════════════════════════════════════════════
+       PROJECT HERO
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="project-hero">
+    <div class="container project-hero-content">
+      <div class="project-category-tag">Web Design · WordPress · Local Services</div>
+
+      <h1 class="project-headline">
+        Haushaltsankauf24 — Rebuilding a <span class="accent">household clearance</span> business online
+      </h1>
+
+      <p class="project-intro">
+        A household clearance company serving North Rhine-Westphalia was trading under a domain
+        nobody could spell, on a site that asked visitors to work for the contact details.
+        The rebuild moved the business to haushaltsankauf24.de and rebuilt the path from
+        "I need this cleared" to "someone is coming to look at it".
+      </p>
+
+      <div class="project-cta-row">
+        <a href="https://haushaltsankauf24.de" target="_blank" rel="noopener" class="live-link">
+          View Live Site
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </div>
+
+      <div class="project-meta-grid">
+        <div class="project-meta-item">
+          <div class="meta-label">Client</div>
+          <div class="meta-value">Gallery Jarrodi</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Market</div>
+          <div class="meta-value">Nordrhein-Westfalen, Germany</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Platform</div>
+          <div class="meta-value">WordPress · Elementor</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Deliverables</div>
+          <div class="meta-value">Site Architecture, UX, UI Design, Build</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">01</span> Overview</div>
+        <h2 class="section-heading">A local service business, <span class="accent">hard to find and harder to trust</span></h2>
+        <p class="body-text">
+          Haushaltsauflösung — clearing out a household — is something people arrange at difficult
+          moments: a death in the family, a move into care, a property that has to be emptied before
+          it changes hands. The visitor is rarely shopping around for fun. They want to know
+          <strong>that the company is real, what it costs, and how fast someone can come</strong>.
+        </p>
+        <p class="body-text">
+          The original site, haushaltsaufloesungennrw.de, worked against all three. The domain was
+          long and easy to mistype, which quietly costs a business every referral made by word of
+          mouth. The new domain, haushaltsankauf24.de, is shorter, spellable over the phone, and
+          says what the business does.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" style="padding-top: 0;">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">02</span> Diagnosis</div>
+        <h2 class="section-heading">What was in the way of <span class="accent">an enquiry</span></h2>
+      </div>
+
+      <div class="diagnosis-grid reveal">
+        <div class="diagnosis-card challenges">
+          <h3><span class="icon-circle">✕</span> Challenges</h3>
+          <ul>
+            <li>A domain too long to say out loud or type correctly from memory</li>
+            <li>No immediate answer to "do you serve my city?" — decisive in a regional trade</li>
+            <li>Pricing and process left unexplained, so visitors had to call to learn anything</li>
+            <li>Trust signals absent on a purchase people make while under stress</li>
+            <li>Contact buried below the fold on mobile, where most local searches happen</li>
+          </ul>
+        </div>
+
+        <div class="diagnosis-card direction">
+          <h3><span class="icon-circle">✓</span> Design Direction</h3>
+          <ul>
+            <li>Lead with coverage: name the NRW cities served, above the fold</li>
+            <li>Make the process explicit — assessment, offer, clearance, handover — so nothing feels hidden</li>
+            <li>Put a phone number and enquiry form within reach from every section</li>
+            <li>Separate the two offers, clearance and purchase, instead of blurring them</li>
+            <li>Build it in Elementor so the client can edit copy without a developer</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section" style="padding-top: 0;">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">03</span> Before / After</div>
+        <h2 class="section-heading">The same business, <span class="accent">a different first impression</span></h2>
+        <p class="body-text">
+          <strong>haushaltsaufloesungennrw.de</strong> → <strong>haushaltsankauf24.de</strong>.
+          The move was not cosmetic: the domain, the structure, and the order in which the site
+          answers questions all changed.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       NEXT PROJECT
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="next-project">
+    <div class="container reveal">
+      <div class="next-project-label">Next Project</div>
+      <h2 class="next-project-title">VGK Village Karting</h2>
+      <a href="project-vgk-karting.html">View case study →</a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-copy">© 2026 amadesign — Designed &amp; built with intention.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    });
+
+    // Mobile nav toggle
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+
+    // Reveal observer
+    const ro = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          ro.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+  </script>
+</body>
+</html>
