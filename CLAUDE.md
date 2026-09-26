@@ -30,8 +30,9 @@ Next Project chain (circular): Haushaltsankauf24 → VGK → Manuka Honey → Sk
 | `project-vgk-karting.html` | **OLD system** (Playfair Display, `#e84545` red, old footer "Mohamed Amine") — migrate |
 | `project-manuka-honey.html` | **OLD system** (Playfair Display, `#c8a44e` gold, old footer) — migrate |
 
-Homepage cards: VGK, Manuka, Skillz-up show real mobile shots in device frames.
-Haushaltsankauf24 (hero) is still a typographic wordmark — needs a real screenshot.
+Homepage Work = full-width case-study cards (problem → decision → result), image side alternating.
+VGK, Manuka, Skillz-up use the real mobile shots in assets/. Haushaltsankauf24 uses a German SVG
+wireframe placeholder — replace with a real desktop capture. Its P/D/R copy needs Amine's review.
 
 ## This weekend (Sept 26–27, 2026)
 

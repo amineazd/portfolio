@@ -458,7 +458,7 @@
 
        Skips: .hero-headline (custom CSS animation), .services-heading
        (already animated by initServicesFreestyle), .lh-hero__name
-       (marquee), project wordmarks (already animated per-card).
+       (marquee).
 
        Bulletproof pattern: gsap.set for initial state, autoSplit for
        responsive re-splitting on resize, try/catch + clearProps
@@ -540,119 +540,6 @@
     } catch (err) {
       console.warn('[lucide] createIcons skipped:', err);
     }
-
-/* ═══════════════════════════════════════════════════════════
-   PROJECT CARDS — GSAP letter stagger + parallax + ghost shift
-   ═══════════════════════════════════════════════════════════ */
-    (function () {
-      try {
-        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (typeof gsap === 'undefined') return;
-
-        const cards = document.querySelectorAll('.project-card');
-        if (!cards.length) return;
-
-        const isTouch = window.matchMedia('(hover: none)').matches;
-
-        cards.forEach(card => {
-          const wordmark = card.querySelector('.project-wordmark');
-          const ghost    = card.querySelector('.project-wordmark .ghost');
-          const chars    = card.querySelectorAll('.project-wordmark .word:not(.ghost .word) .char');
-          const bg       = card.querySelector('.project-thumbnail-bg');
-          if (!wordmark || !bg) return;
-
-          // Initial letter entry — set hidden state via gsap.set (never CSS),
-          // so a failed script can't leave the wordmark invisible
-          if (chars.length && !prefersReduced) {
-            gsap.set(chars, { y: 80, opacity: 0, rotateX: -40 });
-
-            const reveal = () => {
-              gsap.to(chars, {
-                y: 0, opacity: 1, rotateX: 0,
-                duration: 0.9,
-                ease: 'power3.out',
-                stagger: 0.04
-              });
-            };
-
-            // Reveal when card enters viewport
-            const io = new IntersectionObserver((entries) => {
-              entries.forEach(e => {
-                if (e.isIntersecting) {
-                  reveal();
-                  io.unobserve(e.target);
-                }
-              });
-            }, { threshold: 0.25 });
-            io.observe(card);
-          }
-
-          // Skip cursor effects on touch devices and reduced motion
-          if (isTouch || prefersReduced) return;
-
-          let rect = null;
-
-          card.addEventListener('mouseenter', () => {
-            rect = card.getBoundingClientRect();
-            // Ghost shifts slightly on hover for stereoscopic split
-            if (ghost) {
-              gsap.to(ghost, {
-                x: 14, y: -8,
-                duration: 0.7,
-                ease: 'power3.out'
-              });
-            }
-          });
-
-          card.addEventListener('mousemove', (e) => {
-            if (!rect) rect = card.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width;
-            const y = (e.clientY - rect.top) / rect.height;
-
-            // Wordmark floats opposite the cursor with subtle 3D tilt
-            gsap.to(wordmark, {
-              x: (x - 0.5) * -24,
-              y: (y - 0.5) * -18,
-              rotateY: (x - 0.5) * 6,
-              rotateX: (y - 0.5) * -4,
-              duration: 0.9,
-              ease: 'power3.out',
-              transformPerspective: 900
-            });
-
-            // Gradient pans toward cursor for depth
-            gsap.to(bg, {
-              backgroundPosition: `${50 + (x - 0.5) * 26}% ${50 + (y - 0.5) * 26}%`,
-              duration: 1.2,
-              ease: 'power2.out'
-            });
-          });
-
-          card.addEventListener('mouseleave', () => {
-            rect = null;
-            gsap.to(wordmark, {
-              x: 0, y: 0, rotateY: 0, rotateX: 0,
-              duration: 1.1,
-              ease: 'elastic.out(1, 0.7)'
-            });
-            if (ghost) {
-              gsap.to(ghost, {
-                x: 0, y: 0,
-                duration: 0.9,
-                ease: 'elastic.out(1, 0.6)'
-              });
-            }
-            gsap.to(bg, {
-              backgroundPosition: '50% 50%',
-              duration: 1.2,
-              ease: 'power3.out'
-            });
-          });
-        });
-      } catch (err) {
-        console.warn('[project-cards] motion init skipped:', err);
-      }
-    })();
 
 /* ═══════════════════════════════════════════════════════════
    TOOLKIT — spotlight cursor tracking on category cards
