@@ -27,8 +27,8 @@ Next Project chain (circular): Haushaltsankauf24 → VGK → Manuka Honey → Sk
 |---|---|
 | `project-haushaltsankauf.html` | Unified system, replaced SnapOps. Needs before/after screenshots + client brief |
 | `project-skillzup.html` | Unified system. Hero `assets/Skillzup_screen.png` |
-| `project-vgk-karting.html` | **OLD system** (Playfair Display, `#e84545` red, old footer "Mohamed Amine") — migrate |
-| `project-manuka-honey.html` | **OLD system** (Playfair Display, `#c8a44e` gold, old footer) — migrate |
+| `project-vgk-karting.html` | Unified system. Hero = `assets/vgk_screen.png`. Needs: brand identity, pricing accordion, desktop views |
+| `project-manuka-honey.html` | Unified system. Hero = `assets/Makunahoney_screen.png`. Needs: homepage, product page + UMF switcher, mobile views |
 
 Homepage Work = full-width case-study cards (problem → decision → result), image side alternating.
 VGK, Manuka, Skillz-up use the real mobile shots in assets/. Haushaltsankauf24 uses a German SVG
@@ -36,16 +36,21 @@ wireframe placeholder — replace with a real desktop capture. Its P/D/R copy ne
 
 ## This weekend (Sept 26–27, 2026)
 
-1. Migrate VGK + Manuka Honey onto the unified system (nav, noise, tokens, fonts, GSAP, footer). Do this first so new pages build from one template.
-2. New case study: **AloCut** — barber haircut reservation product; 14-day free trial; barber onboarding questionnaire (12 questions). Start with case study structure.
-3. Finish **Haushaltsankauf24** — page scaffolded (hero, overview, diagnosis, before/after intro).
+1. New case study: **AloCut** — barber haircut reservation product; 14-day free trial; barber onboarding questionnaire (12 questions). Start with case study structure.
+2. Finish **Haushaltsankauf24** — page scaffolded (hero, overview, diagnosis, before/after intro).
    Before: haushaltsaufloesungennrw.de → After: haushaltsankauf24.de (WordPress + Elementor), client Gallery Jarrodi.
    Still needed from Amine: before screenshots (mobile + desktop), original brief, scope confirmation.
    Then add: before vs after visuals, client brief vs what was built, UX logic per decision.
-4. Extend the Next Project chain to include both new pages.
-5. Decide homepage card imagery now that the grid grows to 6.
+3. Extend the Next Project chain to include both new pages.
+4. Decide homepage card imagery now that the grid grows to 6.
 
 Other open items: hero counters showing "0+" instead of real values (bug); GSAP Tier 2 (Flip card→case study transition, SplitText scramble on section numbers, Draggable + Inertia on Toolkit tags); Alf Al Faras case study planned later.
+
+## Case-study page conventions
+
+- Every case study inlines its own `<style>` (no shared stylesheet). Template = `project-skillzup.html`.
+- Scroll reveals on case studies use a small IntersectionObserver (`.reveal` → `.visible`), not GSAP.
+- Missing visuals are marked `<!-- VISUAL NEEDED: … -->` in the HTML — never publish "Replace with…" boxes.
 
 ## Hard-won rules
 
