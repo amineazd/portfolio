@@ -21,16 +21,17 @@ Contact on site: contact@amadesign.online
 
 ## Case studies
 
-Next Project chain (circular): Haushaltsankauf24 → VGK → Manuka Honey → Skillz-up → Haushaltsankauf24
+Next Project chain (circular): Haushaltsankauf24 → VGK → Manuka Honey → Skillz-up → AZARO → Haushaltsankauf24
 
 | Page | Status |
 |---|---|
 | `project-haushaltsankauf.html` | Unified system, replaced SnapOps. Needs before/after screenshots + client brief |
 | `project-skillzup.html` | Unified system. Hero `assets/Skillzup_screen.png` |
 | `project-vgk-karting.html` | Unified system. Hero = `assets/vgk_screen.png`. Needs: brand identity, pricing accordion, desktop views |
+| `project-azaro.html` | Unified system. Menswear e-commerce, Rabat (Nov 2026). Real renders of Amine's prototype/wireframes/sitemap in `assets/azaro_*`. Needs: launch status, results, client quote, client OK to be named |
 | `project-manuka-honey.html` | Unified system. Hero = `assets/Makunahoney_screen.png`. Needs: homepage, product page + UMF switcher, mobile views |
 
-Homepage Work = full-width case-study cards (problem → decision → result), image side alternating.
+Homepage Work = full-width case-study cards (AZARO first, newest) (problem → decision → result), image side alternating.
 VGK, Manuka, Skillz-up use the real mobile shots in assets/. Haushaltsankauf24 uses a German SVG
 wireframe placeholder — replace with a real desktop capture. Its P/D/R copy needs Amine's review.
 

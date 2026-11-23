@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AZARO — Menswear E-commerce, Rabat — amadesign</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       DESIGN TOKENS — synced with homepage
+    ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --bg-card-hover: #1c1c28;
+      --bg-elevated: #1e1e2a;
+      --text-primary: #f0eeeb;
+      --text-secondary: #9694a0;
+      --text-muted: #5c5a66;
+      --text-accent: #c8ff00;
+      --accent: #c8ff00;
+      --accent-dim: rgba(200, 255, 0, 0.12);
+      --accent-glow: rgba(200, 255, 0, 0.25);
+      --accent-secondary: #6366f1;
+      --accent-tertiary: #f472b6;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(255, 255, 255, 0.12);
+      --glass: rgba(255, 255, 255, 0.03);
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --container: 1280px;
+      --radius: 16px;
+      --radius-sm: 8px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
+    ::selection { background: var(--accent); color: var(--bg-primary); }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container { max-width: var(--container); margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+
+    /* Noise overlay */
+    .noise-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 9999; opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Reveal animations */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       NAVBAR — synced with homepage architecture
+    ═══════════════════════════════════════════════════════════════ */
+    .navbar {
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      padding: 0 clamp(20px, 4vw, 48px);
+      transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+    }
+    .navbar.scrolled {
+      background: rgba(10, 10, 15, 0.8);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .navbar-inner {
+      max-width: var(--container); margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+    }
+    .logo {
+      font-family: var(--font-display); font-weight: 800; font-size: 1.2rem;
+      letter-spacing: -0.03em; display: flex; align-items: center; gap: 8px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 12px var(--accent-glow);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.8); } }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 500;
+      color: var(--text-secondary); transition: color 0.3s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1.5px;
+      background: var(--accent); transition: width 0.3s var(--ease-out);
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      padding: 10px 24px; border: 1px solid var(--border-hover); border-radius: 100px;
+      font-size: 0.85rem; font-weight: 500; color: var(--text-primary) !important;
+      transition: all 0.3s var(--ease-out);
+    }
+    .nav-cta:hover { background: var(--accent); color: var(--bg-primary) !important; border-color: var(--accent); }
+    .nav-cta:hover::after { display: none; }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 8px; }
+    .hamburger span { display: block; width: 24px; height: 1.5px; background: var(--text-primary); transition: all 0.3s var(--ease-out); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       PROJECT HERO
+    ═══════════════════════════════════════════════════════════════ */
+    .project-hero {
+      padding: 160px 0 80px;
+      position: relative;
+    }
+    .project-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 60% 60% at 50% 30%, black, transparent);
+      pointer-events: none;
+    }
+    .project-hero-content { position: relative; z-index: 2; }
+
+    .project-category-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 100px;
+      background: var(--accent-dim); border: 1px solid rgba(200, 255, 0, 0.15);
+      font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .project-headline {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2.5rem, 6vw, 5.5rem);
+      line-height: 1; letter-spacing: -0.04em;
+      margin-bottom: 32px;
+      max-width: 900px;
+    }
+    .project-headline .accent { color: var(--accent); font-style: italic; }
+    .project-intro {
+      max-width: 720px; font-size: 1.15rem;
+      color: var(--text-secondary); line-height: 1.7;
+      margin-bottom: 48px;
+    }
+    .project-cta-row {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 80px;
+    }
+    .live-link {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px; border-radius: 100px;
+      background: var(--accent); color: var(--bg-primary);
+      font-weight: 600; font-size: 0.95rem;
+      transition: all 0.3s var(--ease-out);
+    }
+    .live-link:hover { box-shadow: 0 8px 32px var(--accent-glow); transform: translateY(-2px); }
+    .live-link svg { transition: transform 0.3s; }
+    .live-link:hover svg { transform: translate(2px, -2px); }
+
+    .project-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 80px;
+    }
+    .project-meta-item {
+      padding: 28px;
+      background: var(--bg-card);
+    }
+    .meta-label {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .meta-value {
+      font-family: var(--font-display); font-weight: 600;
+      font-size: 1rem; line-height: 1.4;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MOCKUP SHOWCASE
+    ═══════════════════════════════════════════════════════════════ */
+    .mockup-section { padding: 80px 0; }
+
+    .mockup-section-label {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 32px;
+    }
+    .mockup-section-label::before { content: ''; width: 32px; height: 1px; background: var(--text-muted); }
+    .mockup-section-label .num { color: var(--accent); }
+
+    .mockup-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      letter-spacing: -0.03em; line-height: 1.15;
+      margin-bottom: 16px;
+      max-width: 720px;
+    }
+    .mockup-subheading {
+      color: var(--text-secondary); font-size: 1.05rem;
+      line-height: 1.7; max-width: 640px;
+      margin-bottom: 56px;
+    }
+
+    .mockup-frame {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: linear-gradient(180deg, #1a1d24 0%, #0d0f14 100%);
+      padding: clamp(16px, 3vw, 32px);
+      box-shadow:
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+    .mockup-frame.no-padding { padding: 0; }
+    .mockup-frame svg { display: block; width: 100%; height: auto; }
+
+    .mockup-caption {
+      margin-top: 24px;
+      font-family: var(--font-mono); font-size: 0.75rem;
+      letter-spacing: 0.05em; color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       CONTENT SECTIONS
+    ═══════════════════════════════════════════════════════════════ */
+    .content-section { padding: 100px 0; }
+    .section-heading {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: -0.03em; line-height: 1.1;
+      margin-bottom: 32px;
+      max-width: 720px;
+    }
+    .section-heading .accent { color: var(--accent); }
+    .body-text {
+      max-width: 760px;
+      color: var(--text-secondary);
+      font-size: 1.05rem; line-height: 1.8;
+      margin-bottom: 20px;
+    }
+    .body-text strong { color: var(--text-primary); font-weight: 500; }
+
+    .diagnosis-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      margin-top: 48px;
+    }
+    .diagnosis-card {
+      padding: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .diagnosis-card h3 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.15rem; letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .diagnosis-card h3 .icon-circle {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700;
+    }
+    .challenges h3 .icon-circle { background: rgba(244, 114, 182, 0.15); color: #f472b6; }
+    .direction h3 .icon-circle { background: var(--accent-dim); color: var(--accent); }
+    .diagnosis-card ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .diagnosis-card li {
+      color: var(--text-secondary); font-size: 0.95rem;
+      line-height: 1.6; padding-left: 20px; position: relative;
+    }
+    .diagnosis-card li::before {
+      content: ''; position: absolute; left: 0; top: 10px;
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .challenges li::before { background: #f472b6; }
+    .direction li::before { background: var(--accent); }
+
+    /* Process timeline */
+    .process-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      margin-top: 48px;
+    }
+    .process-step {
+      padding: 32px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: all 0.4s var(--ease-out);
+    }
+    .process-step:hover { background: var(--bg-card-hover); border-color: var(--border-hover); transform: translateY(-4px); }
+    .process-step-num {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: 2.5rem; color: var(--accent-dim); line-height: 1;
+      margin-bottom: 16px;
+    }
+    .process-step h3 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.1rem; margin-bottom: 12px;
+    }
+    .process-step p { color: var(--text-secondary); font-size: 0.88rem; line-height: 1.7; }
+
+    /* Impact stats */
+    .impact-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+      background: var(--border); border-radius: var(--radius); overflow: hidden;
+      margin-top: 48px;
+    }
+    .impact-stat { padding: 40px 28px; background: var(--bg-card); text-align: left; }
+    .impact-number {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3rem);
+      letter-spacing: -0.03em; color: var(--accent);
+      line-height: 1; margin-bottom: 10px;
+    }
+    .impact-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-secondary); text-transform: uppercase; }
+
+    /* Toolkit chips */
+    .toolkit-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .toolkit-chip {
+      padding: 10px 18px; border-radius: 100px;
+      border: 1px solid var(--border-hover);
+      font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    /* Next project */
+    .next-project {
+      padding: 100px 0; border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .next-project-label {
+      font-family: var(--font-mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 16px;
+    }
+    .next-project-title {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .next-project a {
+      display: inline-flex; align-items: center; gap: 12px;
+      color: var(--accent); font-size: 1.1rem; font-weight: 500;
+      transition: gap 0.3s var(--ease-out);
+    }
+    .next-project a:hover { gap: 20px; }
+
+    /* Footer — synced with homepage */
+    .footer { padding: 40px 0; border-top: 1px solid var(--border); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--text-muted); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .project-meta-grid { grid-template-columns: repeat(2, 1fr); }
+      .process-grid { grid-template-columns: repeat(2, 1fr); }
+      .impact-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none; position: fixed; top: 72px; left: 0; width: 100%;
+        background: rgba(10, 10, 15, 0.97); backdrop-filter: blur(20px);
+        flex-direction: column; padding: 32px; gap: 24px;
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+      .diagnosis-grid { grid-template-columns: 1fr; }
+      .project-meta-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+    }
+    /* ═══════════════════════════════════════════════════════════════
+       SHOT STAGE — real mobile screenshot on a tinted stage
+    ═══════════════════════════════════════════════════════════════ */
+    .shot-stage {
+      position: relative;
+      display: flex; justify-content: center;
+      height: clamp(460px, 52vw, 660px);
+      padding-top: 64px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background:
+        radial-gradient(90% 70% at 50% 105%, var(--stage-glow, transparent), transparent 65%),
+        var(--bg-card);
+    }
+    .shot-stage img {
+      width: min(320px, 72%);
+      aspect-ratio: 1 / 2;
+      object-fit: cover; object-position: top center;
+      border-radius: 22px;
+      box-shadow: 0 40px 90px rgba(0, 0, 0, 0.55);
+    }
+    .impact-grid.is-3 { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 768px) {
+      .shot-stage { height: 440px; padding-top: 40px; }
+      .impact-grid.is-3 { grid-template-columns: 1fr; }
+    }
+    /* ═══════════════════════════════════════════════════════════════
+       AZARO — page-specific additions
+    ═══════════════════════════════════════════════════════════════ */
+    .mockup-frame img { display: block; width: 100%; height: auto; border-radius: 10px; }
+    .mockup-frame.is-paper { background: linear-gradient(180deg, #f3f3f1 0%, #e9e9e6 100%); }
+    .mockup-stack { display: grid; gap: 20px; }
+
+    .process-grid.is-5 { grid-template-columns: repeat(5, 1fr); }
+    .process-step-date {
+      font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px;
+    }
+
+    .decision-list { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 48px; }
+    .decision {
+      padding: 28px 28px 26px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      display: grid; gap: 10px; align-content: start;
+    }
+    .decision-num { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.15em; color: var(--accent); }
+    .decision h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; line-height: 1.35; letter-spacing: -0.01em; }
+    .decision p { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.65; }
+
+    /* Long next-project names (Haushaltsankauf24) must fit a 390px phone */
+    .next-project-title { font-size: clamp(1.25rem, 5.5vw, 3.5rem); }
+
+    .split { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
+    .split .shot-stage { margin: 0; }
+
+    .swatches { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin: 40px 0 16px; }
+    .swatch { display: grid; gap: 10px; }
+    .swatch i { display: block; aspect-ratio: 1 / 1; border-radius: var(--radius-sm); border: 1px solid var(--border-hover); }
+    .swatch span { font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.04em; }
+    .ds-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+    .ds-grid .diagnosis-card { padding: 28px; }
+    .ds-grid .diagnosis-card h3 { margin-bottom: 14px; font-size: 1rem; }
+    .ds-grid p { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.65; }
+
+    .learned {
+      margin-top: 64px; padding: 40px; border-radius: var(--radius);
+      border: 1px solid rgba(200, 255, 0, 0.15); background: var(--accent-dim);
+    }
+    .learned .meta-label { margin-bottom: 14px; }
+    .learned p { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.15rem, 2vw, 1.5rem); line-height: 1.45; letter-spacing: -0.01em; max-width: 860px; }
+
+    @media (max-width: 1024px) {
+      .process-grid.is-5 { grid-template-columns: repeat(2, 1fr); }
+      .split { grid-template-columns: 1fr; gap: 40px; }
+      .ds-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .decision-list { grid-template-columns: 1fr; }
+      .process-grid.is-5 { grid-template-columns: 1fr; }
+      .swatches { grid-template-columns: repeat(4, 1fr); }
+      .learned { padding: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="noise-overlay"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       NAVIGATION — synced with homepage architecture
+  ═══════════════════════════════════════════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-dot"></span>
+        amadesign.
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="about.html">About</a></li>
+        <li><a href="index.html#work">Work</a></li>
+        <li><a href="index.html#contact" class="nav-cta">Let's Talk</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PROJECT HERO
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="project-hero">
+    <div class="container project-hero-content">
+      <div class="project-category-tag">E-commerce · UX/UI · Design System</div>
+
+      <h1 class="project-headline">
+        AZARO — Menswear, <span class="accent">pay on delivery</span>
+      </h1>
+
+      <p class="project-intro">
+        Turning an Instagram-only menswear store in Rabat into a phone-first shop where customers order in four fields and pay at the door. I designed it end to end, from the kickoff questionnaire to a Shopify-ready design system.
+      </p>
+
+      <!-- STATUS NEEDED: once the shop is live, add a .project-cta-row with a .live-link to the store URL. -->
+
+      <div class="project-meta-grid">
+        <div class="project-meta-item">
+          <div class="meta-label">Role</div>
+          <div class="meta-value">Product Designer &amp; Project Lead (solo)</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Timeline</div>
+          <div class="meta-value">17–22 Nov 2026</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Platform</div>
+          <div class="meta-value">Shopify · Dawn · FR + AR</div>
+        </div>
+        <div class="project-meta-item">
+          <div class="meta-label">Deliverables</div>
+          <div class="meta-value">Brief, IA, Wireframes, UI, Design System</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       01 — HOMEPAGE, DESKTOP
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="mockup-section">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">01</span> Homepage</div>
+        <h2 class="mockup-heading">Sell the outfit, not the single piece</h2>
+        <p class="mockup-subheading">The hero is <em>Essayez le look</em>: a swipeable carousel of six complete outfits. Numbered pins name each piece, and the side panel lists them with prices, sizes and one button to add the full look at 10% off.</p>
+      </div>
+
+      <div class="mockup-frame reveal">
+        <img src="assets/azaro_home_desktop.jpg" alt="AZARO homepage on desktop: the Essayez le look carousel with a three-piece outfit and its side panel listing a cap, a puffer and a tracksuit with prices" loading="lazy" decoding="async" width="1800" height="1125">
+      </div>
+      <p class="mockup-caption">AZARO — homepage prototype, desktop (French storefront)</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       02 — OVERVIEW
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">02</span> Overview</div>
+        <h2 class="section-heading">A store that sold on Instagram but <span class="accent">couldn't take orders</span></h2>
+        <p class="body-text">AZARO is a men's streetwear and sportswear store on Avenue Al Kifah in Rabat. It sells sets, puffers, fleeces and knitwear at <strong>99 to 249 DH</strong>, in sizes M to XXL. Every sale started on Instagram: a Reel filmed in the store, the price written on the video, then a DM or a WhatsApp message.</p>
+        <p class="body-text">That meant every order needed a person to answer, confirm the size and arrange delivery by hand. Customers who browsed at night, or outside Rabat, often never got an answer.</p>
+        <p class="body-text"><strong>The goal</strong> was not just a website. It was a working sales process: a shop that takes real orders on its own, in a market where most people pay cash on delivery.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       03 — DIAGNOSIS
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section" style="padding-top: 0;">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">03</span> Diagnosis</div>
+        <h2 class="section-heading">Real constraints, <span class="accent">clear direction</span></h2>
+      </div>
+
+      <div class="diagnosis-grid reveal">
+        <div class="diagnosis-card challenges">
+          <h3><span class="icon-circle">✕</span> Constraints</h3>
+          <ul>
+            <li><strong>Phone first.</strong> Almost all traffic arrives from Instagram and TikTok, on mid-range Android phones.</li>
+            <li><strong>Cash on delivery.</strong> A refused parcel costs more than a lost sale, so trust has to come before style.</li>
+            <li><strong>No brand guidelines.</strong> The only identity was a backlit shop sign and a black-and-white store.</li>
+            <li><strong>Strict platform rules.</strong> No third-party brand names in product names, photos, tags or ads.</li>
+            <li><strong>Lean budget.</strong> One launch budget for the Shopify plan, the domain and the first ads.</li>
+          </ul>
+        </div>
+
+        <div class="diagnosis-card direction">
+          <h3><span class="icon-circle">✓</span> Design Direction</h3>
+          <ul>
+            <li>Make three things obvious on every screen: <strong>the price, the size, and that you pay on delivery</strong></li>
+            <li>Keep what already worked on Instagram: the big readable price, sizes up front, the real store as proof</li>
+            <li>Black is the brand: a quiet neutral system where colour comes only from the clothes</li>
+            <li>A checkout short enough to finish one-handed, with WhatsApp as the safety net at every step</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       04 — PROCESS
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section" style="padding-top: 0;">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">04</span> Process</div>
+        <h2 class="section-heading">Brief to design system <span class="accent">in six days</span></h2>
+      </div>
+
+      <div class="process-grid is-5 reveal">
+        <div class="process-step">
+          <div class="process-step-num">01</div>
+          <div class="process-step-date">17 Nov</div>
+          <h3>Kickoff brief</h3>
+          <p>A 12-question brief that put blockers first: admin access, budget, card payments, margins, delivery partner, who answers WhatsApp. Each question said <em>why</em> it mattered, so answers came back faster.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">02</div>
+          <div class="process-step-date">20 Nov</div>
+          <h3>Brand audit</h3>
+          <p>I studied the last 12 Instagram posts as a visitor. The moodboard kept what worked: black, grey and white like the backlit sign, colour only from the clothes.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">03</div>
+          <div class="process-step-date">20 Nov</div>
+          <h3>Sitemap</h3>
+          <p>Built from real stock, not a fashion template. Sets were 5 of 12 posts, so they got their own category. Unconfirmed categories stayed dashed.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">04</div>
+          <div class="process-step-date">20 Nov</div>
+          <h3>Wireframes</h3>
+          <p>Eight mobile screens along the real path, from Instagram to confirmation, each decision tied to a UX law.</p>
+        </div>
+        <div class="process-step">
+          <div class="process-step-num">05</div>
+          <div class="process-step-date">22 Nov</div>
+          <h3>Design system</h3>
+          <p>Tokens, type, components and content rules written for Shopify Dawn, so the build matches the design without guesswork.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       05 — INFORMATION ARCHITECTURE
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="mockup-section">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">05</span> Information Architecture</div>
+        <h2 class="mockup-heading">A catalogue built from what the store actually sells</h2>
+        <p class="mockup-subheading">Eight menu entries. Promo sits in black, and <em>Petits prix</em> (under 150 DH, under 250 DH) gets its own entry, because price is the main reason people buy. Dashed categories wait for confirmed stock.</p>
+      </div>
+
+      <div class="mockup-frame is-paper reveal">
+        <img src="assets/azaro_sitemap.jpg" alt="AZARO sitemap: home branches into Nouveautés, Ensembles, Vestes et manteaux, Hauts, Bas (pending), Accessoires, Promo and Petits prix, with sub-collections" loading="lazy" decoding="async" width="1800" height="612">
+      </div>
+      <p class="mockup-caption">Sitemap v1 — solid at launch, dashed pending stock confirmation</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       06 — PURCHASE FLOW WIREFRAMES
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="mockup-section">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">06</span> Purchase Flow</div>
+        <h2 class="mockup-heading">Eight screens, structure before style</h2>
+        <p class="mockup-subheading">Low-fidelity on purpose: no images, no colour, just order and labels. Design-system components are tagged on each screen so the jump to UI is mechanical.</p>
+      </div>
+
+      <div class="mockup-stack reveal">
+        <div class="mockup-frame is-paper">
+          <img src="assets/azaro_wireframes_1.jpg" alt="Wireframes 01 to 04: homepage, menu, collection grid and product page with size selector" loading="lazy" decoding="async" width="1800" height="1410">
+        </div>
+        <div class="mockup-frame is-paper">
+          <img src="assets/azaro_wireframes_2.jpg" alt="Wireframes 05 to 08: cart drawer showing the amount to pay on delivery, four-field checkout, confirmation screen and size guide" loading="lazy" decoding="async" width="1800" height="880">
+        </div>
+      </div>
+      <p class="mockup-caption">Home → Menu → Collection → Product → Cart → Checkout → Confirmation → Size guide</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       07 — KEY DECISIONS
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">07</span> Key Decisions</div>
+        <h2 class="section-heading">Every screen answers <span class="accent">a cash-on-delivery doubt</span></h2>
+      </div>
+
+      <div class="decision-list reveal">
+        <div class="decision">
+          <span class="decision-num">01 · Announcement bar</span>
+          <h3>“Pay on delivery · Delivery all over Morocco”, stated once</h3>
+          <p>Answers the first question of COD shoppers without repeating it on every block.</p>
+        </div>
+        <div class="decision">
+          <span class="decision-num">02 · Homepage</span>
+          <h3>New arrivals right after the hero</h3>
+          <p>Returning Instagram followers come for the latest drop, so it sits where they look first.</p>
+        </div>
+        <div class="decision">
+          <span class="decision-num">03 · Product card</span>
+          <h3>One fixed card: photo and badge, name, price</h3>
+          <p>Easy to scan in a two-column grid. New, Promo and Sold out read at a glance.</p>
+        </div>
+        <div class="decision">
+          <span class="decision-num">04 · Product page</span>
+          <h3>One black button, nothing between size and “Add to cart”</h3>
+          <p>Keeps attention on the one action that sells. WhatsApp stays a secondary link.</p>
+        </div>
+        <div class="decision">
+          <span class="decision-num">05 · Cart drawer</span>
+          <h3>“To pay on delivery: 378 DH”</h3>
+          <p>No surprise at the door, so fewer refused parcels. A bar shows what's left for free delivery, and removing an item gives a 5-second Undo.</p>
+        </div>
+        <div class="decision">
+          <span class="decision-num">06 · Checkout</span>
+          <h3>Four fields, no account</h3>
+          <p>Name, WhatsApp number, city, address. The phone field accepts 06, 07 or +212, with or without spaces.</p>
+        </div>
+        <div class="decision">
+          <span class="decision-num">07 · Confirmation</span>
+          <h3>A real delivery date and a line in Darija</h3>
+          <p>“We'll call you before shipping”, plus numbered next steps. The flow ends on reassurance and sets up the WhatsApp confirmation.</p>
+        </div>
+        <div class="decision">
+          <span class="decision-num">08 · Size guide</span>
+          <h3>One table per product family, with an “Ask on WhatsApp” fallback</h3>
+          <p>Sizing doubt is the main reason people hesitate on clothes. A human answer is one tap away.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       08 — MOBILE
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section" style="padding-top: 0;">
+    <div class="container">
+      <div class="split">
+        <div class="reveal">
+          <div class="mockup-section-label"><span class="num">08</span> On the phone</div>
+          <h2 class="section-heading">The look panel becomes a <span class="accent">bottom sheet</span></h2>
+          <p class="body-text">On phones the outfit stays on stage and the pieces slide in as horizontal cards, with one button that adds the whole look and shows its price.</p>
+          <p class="body-text">Below sit the trust strip (24–72h delivery, 14-day exchange, the Rabat store) and the full product grid with category chips.</p>
+        </div>
+        <div class="reveal">
+          <div class="shot-stage" style="--stage-glow: rgba(246, 245, 242, 0.12);">
+            <img src="assets/azaro_screen.png" alt="AZARO homepage on mobile: Essayez le look with a numbered outfit and a bottom sheet to add the full look for 429 DH" loading="lazy" decoding="async">
+          </div>
+          <p class="mockup-caption">AZARO — homepage prototype, mobile</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       09 — DESIGN SYSTEM
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section" style="padding-top: 0;">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">09</span> Design System</div>
+        <h2 class="section-heading">Seven neutrals. <span class="accent">Black is the brand.</span></h2>
+        <p class="body-text">No brand hue. Colour comes only from the clothes, and green or red appear only for success and error.</p>
+
+        <div class="swatches" aria-label="AZARO colour palette">
+          <div class="swatch"><i style="background:#0d0d0d"></i><span>#0D0D0D</span></div>
+          <div class="swatch"><i style="background:#3a3a3a"></i><span>#3A3A3A</span></div>
+          <div class="swatch"><i style="background:#62625f"></i><span>#62625F</span></div>
+          <div class="swatch"><i style="background:#8a8a86"></i><span>#8A8A86</span></div>
+          <div class="swatch"><i style="background:#e2e2df"></i><span>#E2E2DF</span></div>
+          <div class="swatch"><i style="background:#f3f3f1"></i><span>#F3F3F1</span></div>
+          <div class="swatch"><i style="background:#ffffff"></i><span>#FFFFFF</span></div>
+        </div>
+      </div>
+
+      <div class="ds-grid reveal">
+        <div class="diagnosis-card direction">
+          <h3><span class="icon-circle">Aa</span> Type</h3>
+          <p>Montserrat 600 in tracked capitals echoes the shop sign. Inter keeps prices readable on cheap Android screens. IBM Plex Sans Arabic powers the Arabic storefront.</p>
+        </div>
+        <div class="diagnosis-card direction">
+          <h3><span class="icon-circle">◻</span> Rules</h3>
+          <p>Square corners, 1px lines, no shadows. 44px tap targets and WCAG 2.1 AA contrast. A pill shape is reserved for WhatsApp.</p>
+        </div>
+        <div class="diagnosis-card direction">
+          <h3><span class="icon-circle">7</span> Components</h3>
+          <p>Logo, Button, Badge, ProductCard, SizeSelector, TrustList and TextField, each mapped directly onto a Shopify Dawn section.</p>
+        </div>
+      </div>
+
+      <p class="body-text" style="margin-top: 40px;"><strong>Photo direction.</strong> One framing for the whole catalogue: the item on a black hanger in front of the store's grey wall, then worn, then a detail shot. Prices live in the interface, never on the image.</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       10 — OUTCOME
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="content-section" style="padding-top: 0;">
+    <div class="container">
+      <div class="reveal">
+        <div class="mockup-section-label"><span class="num">10</span> Outcome</div>
+        <h2 class="section-heading">From DM-only selling to a <span class="accent">buildable shop</span></h2>
+        <p class="body-text">In six days the store went from taking orders by hand to a complete, documented shop design: brief, moodboard, sitemap, eight wireframes, a homepage prototype and a design system ready for Shopify Dawn.</p>
+      </div>
+
+      <!-- RESULTS NEEDED: after launch, add launch date, orders in the first 30 days,
+           conversion rate, refused COD parcels and a client quote. Do not publish estimates. -->
+
+      <div class="impact-grid reveal">
+        <div class="impact-stat">
+          <div class="impact-number">6</div>
+          <div class="impact-label">Days, kickoff to design system v1.1</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-number">8</div>
+          <div class="impact-label">Purchase-flow screens wireframed</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-number">4</div>
+          <div class="impact-label">Checkout fields, no account</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-number">7</div>
+          <div class="impact-label">Components mapped to Dawn</div>
+        </div>
+      </div>
+
+      <div class="learned reveal">
+        <div class="meta-label">What I learned</div>
+        <p>In a cash-on-delivery market, trust is the conversion lever. Showing the real store, the amount to pay at the door and a WhatsApp follow-up does more than any visual effect.</p>
+      </div>
+
+      <div class="reveal" style="margin-top: 64px;">
+        <div class="mockup-section-label" style="margin-bottom: 16px;"><span class="num">11</span> Toolkit</div>
+        <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 1.4rem; letter-spacing: -0.02em;">What it's built on</h3>
+        <div class="toolkit-chips">
+          <span class="toolkit-chip">Shopify · Dawn</span>
+          <span class="toolkit-chip">Design tokens</span>
+          <span class="toolkit-chip">HTML / CSS prototype</span>
+          <span class="toolkit-chip">Laws of UX</span>
+          <span class="toolkit-chip">WCAG 2.1 AA</span>
+          <span class="toolkit-chip">FR · AR (RTL)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       NEXT PROJECT
+  ═══════════════════════════════════════════════════════════ -->
+  <section class="next-project">
+    <div class="container reveal">
+      <div class="next-project-label">Next Project</div>
+      <h2 class="next-project-title">Haushaltsankauf24</h2>
+      <a href="project-haushaltsankauf.html">View case study →</a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER — synced with homepage
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-copy">© 2026 amadesign — Designed &amp; built with intention.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Navbar scroll
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    });
+
+    // Mobile nav toggle
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    hamburger.addEventListener('click', () => navLinks.classList.toggle('open'));
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+
+    // Reveal observer
+    const ro = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          ro.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+  </script>
+</body>
+</html>
+
